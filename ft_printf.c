@@ -124,6 +124,11 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
+void	ft_putchar_fd(char c, int fd)
+{
+	write(fd, &c, 1);
+}
+
 void	ft_putstr_fd(char *s, int fd)
 {
 	int i;
@@ -287,21 +292,6 @@ char *ft_lst_init(char *s,char *av, va_list ap)
 	return (str);
 }
 
-/*int		ft_len_fin(char *av, va_list ap)
-{
-	t_list lst;
-	int count;
-
-	lst.zero_flag = 0;
-	lst.t_flag = 0;
-	lst.max = INT_MAX;
-	lst.min = 0;
-	lst.period = 0;
-	lst.flag = '\0';
-	lst.star1 = 0;
-	lst.star2 = INT_MAX;
-}*/
-
 int     ft_printf(const char *av, ...)
 {
     int i;
@@ -320,23 +310,18 @@ int     ft_printf(const char *av, ...)
         if (av[i] == '%')
 		{
             s = ft_lst_init(str, ((char*)av) + i, ap);
-			printf("|%s|\n", s);
 			j += ft_strlen(s);
-			str = ft_strjoin(str, s);
-			//printf("|%s|\n", str);
+			ft_putstr_fd(s, 1);
 			i+=2;
 		}
         else
 		{
-			//str = malloc(sizeof(ft_strlen(str) + 1 ));
-			//str[i] = str[j++];
-			str = ft_strcharjoin(str, av[i]);
+			//str = ft_strcharjoin(str, av[i]);
+			ft_putchar_fd(av[i], 1);
 			i++;
 			j++;
 		}
     }
-    str[j] = '\0';
-    ft_putstr_fd(str, 1);
     va_end(ap);
     return ((int)ft_strlen(str)); //incrementer j
 }
