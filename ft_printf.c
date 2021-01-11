@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_printf.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adidion <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/01/11 13:58:38 by adidion           #+#    #+#             */
+/*   Updated: 2021/01/11 13:59:12 by adidion          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_printf.h"
 
 size_t		ft_strlen(const char *str)
@@ -5,8 +17,8 @@ size_t		ft_strlen(const char *str)
 	size_t i;
 
 	i = 0;
-    if (!str)
-        return (0);
+	if (!str)
+		return (0);
 	while (str[i])
 		i++;
 	return (i);
@@ -144,7 +156,7 @@ void	ft_putstr_fd(char *s, int fd)
 static int	ft_isspace(char c)
 {
 	if (c == '\n' || c == ' ' || c == '\t' ||
-	c == '\v' || c == '\f' || c == '\r')
+			c == '\v' || c == '\f' || c == '\r')
 		return (1);
 	return (0);
 }
@@ -186,27 +198,43 @@ int			ft_atoi(const char *str)
 	return ((int)i);
 }
 
+void	print_struct(t_list lst)
+{
+	printf("%d\n", lst.zero_flag);
+	printf("%d\n", lst.t_flag);
+	printf("|%d|\n", lst.max);
+	printf("%d\n", lst.min);
+	printf("%d\n", lst.period);
+	printf("%c\n", lst.flag);
+}
+
 char	*ft_convert_d_2(int n, int i, t_list lst)
 {
 	char *str;
 	int j;
+	int k;
+	int m;
 
 	str = 0;
-	if (i == 0)
-		return (0);
+	//printf("|%d|\n", lst.max);
+	//if (i == 0)
+	//return (0);
+	//print_struct(lst);
 	if (n < 0)
 	{
 		str = ft_strjoin(str, "-");
 		n = -n;
 	}
 	j = ft_strlen(ft_itoa(n));
+	k = lst.max - 1;
+	m = lst.min - 1;
 	if (lst.t_flag == 0)
 	{
-		while ((i-- > lst.max) && (lst.min > j) && (lst.max > j))
+		while (0 < m-- - k)
 		{
 			str = ft_strjoin(str, " ");
 		}
-		while ((lst.max--) - j)
+		while (0 <= ((k--) - j))
 		{
 			str = ft_strjoin(str, "0");
 		}
@@ -214,11 +242,11 @@ char	*ft_convert_d_2(int n, int i, t_list lst)
 	return (str);
 }
 
-char *ft_convert_d(char *av , t_list lst, va_list ap)
+char *ft_convert_d(t_list lst, va_list ap)
 {
-    int n;
+	int n;
 	int i;
-    char *str;
+	char *str;
 
 	i = 0;
 	n = va_arg(ap, int);
@@ -227,34 +255,36 @@ char *ft_convert_d(char *av , t_list lst, va_list ap)
 	if (lst.t_flag == 0)
 	{
 		str = ft_convert_d_2(n, i, lst);
-    	str = ft_strjoin(str, ft_itoa(n));
+		str = ft_strjoin(str, ft_itoa(n));
 	}
 	else
 	{
 		str = ft_itoa(n);
 		str = ft_strjoin(str, ft_convert_d_2(n, i, lst));
 	}
-    return (str);
+	return (str);
 }
 
-char *ft_flag(char **s, char *av , t_list lst, va_list ap)
+char *ft_flag(t_list lst, va_list ap)
 {
-    char *str;
-    if (lst.flag == 'd' || lst.flag == 'i')
-		str = (ft_convert_d(av, lst, ap));
-    return (str);
+	char *str;
+
+	str = 0;
+	if (lst.flag == 'd' || lst.flag == 'i')
+		str = (ft_convert_d(lst, ap));
+	return (str);
 }
 
-void    ft_check_mm(char *av, t_list lst, va_list ap)
+t_list    ft_check_mm(char *av, t_list lst, va_list ap)
 {
-    int i;
+	int i;
 	int n;
 
-    i = 0;
-    if (av[i] >= 1 && av[i] <= 9 && lst.period == 1)
-        lst.max = ft_atoi(av);
-    if (av[i] >= 1 && av[i] <= 9 && !lst.period)
-        lst.min = ft_atoi(av);
+	i = 0;
+	if (av[i] >= '1' && av[i] <= '9' && lst.period == 1 && lst.max == 0)
+		lst.max = ft_atoi(av + i);
+	if (av[i] >= '1' && av[i] <= '9' && !lst.period && lst.min == 0)
+		lst.min = ft_atoi(av + i);
 	if (lst.zero_flag == 1 && lst.t_flag == 1)
 		lst.zero_flag = 0;
 	if (av[i] == '*' && lst.period == 0)
@@ -269,41 +299,45 @@ void    ft_check_mm(char *av, t_list lst, va_list ap)
 	}
 	if (lst.zero_flag == 1 && lst.period == 0 && lst.min)
 		lst.max = lst.min;
+	return (lst);
 }
 
-char *ft_lst_flag(char *s, char *av, va_list ap, t_list lst)
+char *ft_lst_flag(char *av, va_list ap, t_list lst)
 {
-    char *tab;
-    int k;
-    char *str;
-    int i;
+	char *tab;
+	int k;
+	char *str;
+	int i;
 
-    tab = "cspdiuxX%";
-    i = 0;
-    while (av[++i])
-    {
-        if (av[i] == '0')
-            lst.zero_flag = 1;
-        if (av[i] == '-')
-            lst.t_flag = 1;
-        if (av[i] == '.')
-            lst.period = 1;
-        k = 0;
-        while (tab[k++])
-        {
-            if (tab[k] == av[i])
-            {
-                lst.flag = av[i];
-                break;
-            }
-        }
-        ft_check_mm(((char*)(av)) + i, lst, ap);
-    }
-    str = ft_flag(&s, ((char*)(av)) + i, lst, ap);
-    return (str);
+	tab = "cspdiuxX%";
+	i = 0;
+	while (av[++i])
+	{
+		if (av[i] == '0')
+			lst.zero_flag = 1;
+		if (av[i] == '-')
+			lst.t_flag = 1;
+		if (av[i] == '.')
+		{
+			lst.period = 1;
+			lst.max = 0;
+		}
+		k = 0;
+		while (tab[k++])
+		{
+			if (tab[k] == av[i])
+			{
+				lst.flag = av[i];
+				break;
+			}
+		}
+		lst = ft_check_mm(((char*)(av)) + i, lst, ap);
+	}
+	str = ft_flag(lst, ap);
+	return (str);
 }
 
-char *ft_lst_init(char *s,char *av, va_list ap)
+char *ft_lst_init(char *av, va_list ap)
 {
 	t_list lst;
 	char *str;
@@ -314,45 +348,64 @@ char *ft_lst_init(char *s,char *av, va_list ap)
 	lst.min = 0;
 	lst.period = 0;
 	lst.flag = '\0';
-	lst.star1 = 0;
-	lst.star2 = 0;
-	str = (ft_lst_flag(s,((char*)av), ap, lst));
+	str = (ft_lst_flag(((char*)av), ap, lst));
 	return (str);
+}
+
+int		ft_sum_i(char *av)
+{
+	int i;
+	char *tab;
+	int count;
+
+	count = 0;
+	tab = "cspdiuxX%";
+	count++;
+	while (av[count])
+	{
+		i = -1;
+		while (tab[++i])
+			if(tab[i] == av[count])
+				return (++count);
+		count++;
+	}
+	return (0);
 }
 
 int     ft_printf(const char *av, ...)
 {
-    int i;
-    va_list ap;
-    va_start(ap, av);
-    char *str;
+	int i;
+	va_list ap;
+	va_start(ap, av);
+	char *str;
 	char *s;
-    int j;
+	int j;
 
-    i = 0;
-    j = 0;
-   while (av[i])
-    {
-        if (av[i] == '%')
+	i = 0;
+	j = 0;
+	str = 0;
+	while (av[i])
+	{
+		if (av[i] == '%')
 		{
-            s = ft_lst_init(str, ((char*)av) + i, ap);
+			s = ft_lst_init(((char*)av) + i, ap);
 			j += ft_strlen(s);
 			ft_putstr_fd(s, 1);
-			i+=2;
+			i += ft_sum_i(((char*)av) + i);
 		}
-        else
+		else
 		{
 			ft_putchar_fd(av[i], 1);
 			i++;
 			j++;
 		}
-    }
-    va_end(ap);
-    return (j);
+	}
+	va_end(ap);
+	return (j);
 }
 
 int main()
 {
-    ft_printf("aaaa%.10dna\n", 515);
-	printf("aaaa%.10dna\n", 515);
+	ft_printf("aaaa%21.14dna\n", 515);
+	printf("aaaa%21.14dna\n", 515);
 }
