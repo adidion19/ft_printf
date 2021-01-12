@@ -202,10 +202,11 @@ void	print_struct(t_list lst)
 {
 	printf("%d\n", lst.zero_flag);
 	printf("%d\n", lst.t_flag);
-	printf("|%d|\n", lst.max);
+	printf("%d\n", lst.max);
 	printf("%d\n", lst.min);
 	printf("%d\n", lst.period);
 	printf("%c\n", lst.flag);
+	printf("%d\n", lst.zero_print);
 }
 
 char	*ft_convert_d_2(int n, int i, t_list lst)
@@ -216,29 +217,31 @@ char	*ft_convert_d_2(int n, int i, t_list lst)
 	int m;
 
 	str = 0;
-	//printf("|%d|\n", lst.max);
-	//if (i == 0)
-	//return (0);
-	//print_struct(lst);
-	if (n < 0)
-	{
-		str = ft_strjoin(str, "-");
-		n = -n;
-	}
 	j = ft_strlen(ft_itoa(n));
 	k = lst.max - 1;
 	m = lst.min - 1;
+	//print_struct(lst);
+	if (n < 0 && lst.t_flag == 0)
+		k++;
+	if (n < 0 && lst.t_flag == 1)
+		j--;;
 	if (lst.t_flag == 0)
-	{
 		while (0 < m-- - k)
-		{
 			str = ft_strjoin(str, " ");
-		}
-		while (0 <= ((k--) - j))
-		{
-			str = ft_strjoin(str, "0");
-		}
+	if (n < 0)
+	{
+		str = ft_strjoin(str, "-");
+		if (n < 0)
+			m--;
+		n = -n;
 	}
+	while (0 <= ((k--) - j) && lst.zero_print == 0)
+		str = ft_strjoin(str, "0");
+	str = ft_strjoin(str, ft_itoa(n));
+	k = lst.max - 1;
+	if (lst.t_flag == 1)
+		while (0 < m-- - k)
+			str = ft_strjoin(str, " ");
 	return (str);
 }
 
@@ -250,18 +253,7 @@ char *ft_convert_d(t_list lst, va_list ap)
 
 	i = 0;
 	n = va_arg(ap, int);
-	if (lst.min >= lst.max)
-		i = lst.min - lst.max;
-	if (lst.t_flag == 0)
-	{
-		str = ft_convert_d_2(n, i, lst);
-		str = ft_strjoin(str, ft_itoa(n));
-	}
-	else
-	{
-		str = ft_itoa(n);
-		str = ft_strjoin(str, ft_convert_d_2(n, i, lst));
-	}
+	str = ft_convert_d_2(n, i, lst);
 	return (str);
 }
 
@@ -316,7 +308,11 @@ char *ft_lst_flag(char *av, va_list ap, t_list lst)
 		if (av[i] == '0')
 			lst.zero_flag = 1;
 		if (av[i] == '-')
+		{
+			if (lst.period == 1)
+				lst.zero_print = 1;
 			lst.t_flag = 1;
+		}
 		if (av[i] == '.')
 		{
 			lst.period = 1;
@@ -348,6 +344,7 @@ char *ft_lst_init(char *av, va_list ap)
 	lst.min = 0;
 	lst.period = 0;
 	lst.flag = '\0';
+	lst.zero_print = 0;
 	str = (ft_lst_flag(((char*)av), ap, lst));
 	return (str);
 }
@@ -406,6 +403,6 @@ int     ft_printf(const char *av, ...)
 
 int main()
 {
-	ft_printf("aaaa%21.14dna\n", 515);
-	printf("aaaa%21.14dna\n", 515);
+	ft_printf("aaaa%30.-20dna\n", 1);
+	printf("aaaa%30.-20dna\n", 1);
 }

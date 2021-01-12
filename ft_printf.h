@@ -15,7 +15,6 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <stdarg.h>
-# define INT_MAX 2147483647
 
 typedef struct  s_list
 {
@@ -25,8 +24,7 @@ typedef struct  s_list
     int     min;
     int     period;
     char    flag;
-    int     star1;
-    int     star2;
+    int     zero_print;
 }               t_list;
 
 #endif
