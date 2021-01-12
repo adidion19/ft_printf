@@ -198,7 +198,7 @@ int			ft_atoi(const char *str)
 	return ((int)i);
 }
 
-void	print_struct(t_list lst)
+/*void	print_struct(t_list lst)
 {
 	printf("%d\n", lst.zero_flag);
 	printf("%d\n", lst.t_flag);
@@ -207,9 +207,9 @@ void	print_struct(t_list lst)
 	printf("%d\n", lst.period);
 	printf("%c\n", lst.flag);
 	printf("%d\n", lst.zero_print);
-}
+}*/
 
-char	*ft_convert_d_2(int n, int i, t_list lst)
+char	*ft_convert_d_2(int n, t_list lst)
 {
 	char *str;
 	int j;
@@ -221,7 +221,7 @@ char	*ft_convert_d_2(int n, int i, t_list lst)
 	k = lst.max - 1;
 	m = lst.min - 1;
 	//print_struct(lst);
-	if (n < 0 && lst.t_flag == 0)
+	if ((n < 0 || lst.max == 0) && lst.t_flag == 0)
 		k++;
 	if (n < 0 && lst.t_flag == 1)
 		j--;;
@@ -248,12 +248,10 @@ char	*ft_convert_d_2(int n, int i, t_list lst)
 char *ft_convert_d(t_list lst, va_list ap)
 {
 	int n;
-	int i;
 	char *str;
 
-	i = 0;
 	n = va_arg(ap, int);
-	str = ft_convert_d_2(n, i, lst);
+	str = ft_convert_d_2(n, lst);
 	return (str);
 }
 
@@ -328,6 +326,12 @@ char *ft_lst_flag(char *av, va_list ap, t_list lst)
 			}
 		}
 		lst = ft_check_mm(((char*)(av)) + i, lst, ap);
+		if ((av[i] >= '1' && av[i] <= '9') || (av[i] == '0' && av[i - 1] >= '1' && av[i - 1] <= '9'))
+		{
+			while ((av[i] >= '1' && av[i] <= '9') || (av[i] == '0' && av[i - 1] >= '1' && av[i - 1] <= '9'))
+				i++;
+			i--;
+		}
 	}
 	str = ft_flag(lst, ap);
 	return (str);
@@ -401,8 +405,10 @@ int     ft_printf(const char *av, ...)
 	return (j);
 }
 
+#include <stdio.h>
+
 int main()
 {
-	ft_printf("aaaa%30.-20dna\n", 1);
-	printf("aaaa%30.-20dna\n", 1);
+	ft_printf("aaaa%0100.20dna\n", -1);
+	printf("aaaa%0100.20dna\n", -1);
 }
