@@ -224,7 +224,7 @@ char	*ft_convert_d_2(int n, t_list lst)
 	if ((n < 0 || lst.max == 0) && lst.t_flag == 0)
 		k++;
 	if (n < 0 && lst.t_flag == 1)
-		j--;;
+		j--;
 	if (lst.t_flag == 0)
 		while (0 < m-- - k)
 			str = ft_strjoin(str, " ");
@@ -238,7 +238,7 @@ char	*ft_convert_d_2(int n, t_list lst)
 	while (0 <= ((k--) - j) && lst.zero_print == 0)
 		str = ft_strjoin(str, "0");
 	str = ft_strjoin(str, ft_itoa(n));
-	k = lst.max - 1;
+	k = lst.max;
 	if (lst.t_flag == 1)
 		while (0 < m-- - k)
 			str = ft_strjoin(str, " ");
@@ -280,12 +280,21 @@ t_list    ft_check_mm(char *av, t_list lst, va_list ap)
 	if (av[i] == '*' && lst.period == 0)
 	{
 		n = va_arg(ap, int);
-		lst.min = n;
+		if (n < 0)
+		{
+			lst.t_flag = 1;
+			lst.min = -n;
+		}
+		else
+			lst.min = n;
 	}
 	if (av[i] == '*' && lst.period == 1)
 	{
 		n = va_arg(ap, int);
-		lst.max = n;
+		if (n < 0)
+			lst.max = 0;
+		else
+			lst.max = n;
 	}
 	if (lst.zero_flag == 1 && lst.period == 0 && lst.min)
 		lst.max = lst.min;
@@ -409,6 +418,6 @@ int     ft_printf(const char *av, ...)
 
 int main()
 {
-	ft_printf("aaaa%0100.20dna\n", -1);
-	printf("aaaa%0100.20dna\n", -1);
+	ft_printf("aaaa%0*.*dna\n", -10, -20, -25556545);
+	printf("aaaa%0*.*dna\n", -10, -20, -25556545);
 }
