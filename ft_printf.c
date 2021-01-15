@@ -311,7 +311,7 @@ t_list    ft_check_mm(char *av, t_list lst, va_list ap)
 		if (n < 0)
 		{
 			lst.bool3 = 1;
-			if (lst.bool == 1)
+			if (lst.bool == 1 || lst.t_flag == 1)
 				lst.zero_print = 1;
 			else
 				lst.space_print = 1;
@@ -446,6 +446,6 @@ int     ft_printf(const char *av, ...)
 
 int main()
 {
-	ft_printf("aaaa%0*.*dna\n", 40, 20, -25556545);
-	printf("aaaa%0*.*dna\n", 40, 20, -25556545);
+	ft_printf("aaaa%-0*.*dna\n", 40, -20, -25556545);
+	printf("aaaa%-0*.*dna\n", 40, -20, -25556545);
 }
