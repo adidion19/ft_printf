@@ -25,6 +25,10 @@ typedef struct  s_list
     int     period;
     char    flag;
     int     zero_print;
+    int     space_print;
+    int     bool;
+    int     bool2;
+    int     bool3;
 }               t_list;
 
 #endif

@@ -217,15 +217,22 @@ char	*ft_convert_d_2(int n, t_list lst)
 	int m;
 
 	str = 0;
-	j = ft_strlen(ft_itoa(n));
-	k = lst.max - 1;
-	m = lst.min - 1;
+	j = ft_strlen(ft_itoa(n)) + 1;
+	k = lst.max;
+	if (lst.space_print == 1)
+		k = lst.min - 2;
+	m = lst.min;
 	//print_struct(lst);
 	if ((n < 0 || lst.max == 0) && lst.t_flag == 0)
-		k++;
+	{
+		if (lst.bool == 1 || lst.t_flag == 1 || lst.bool3 == 1)
+			k += 2;
+		else
+			k += 1;
+	}
 	if (n < 0 && lst.t_flag == 1)
 		j--;
-	if (lst.t_flag == 0)
+	if (lst.t_flag == 0 && lst.space_print == 0)
 		while (0 < m-- - k)
 			str = ft_strjoin(str, " ");
 	if (n < 0)
@@ -239,9 +246,18 @@ char	*ft_convert_d_2(int n, t_list lst)
 		str = ft_strjoin(str, "0");
 	str = ft_strjoin(str, ft_itoa(n));
 	k = lst.max;
+	j--;
 	if (lst.t_flag == 1)
-		while (0 < m-- - k)
+	{
+		while (0 < m-- - j - k && lst.space_print == 0 && lst.bool && !lst.bool2 && lst.zero_print == 1)
 			str = ft_strjoin(str, " ");
+		m += 1;
+		while (0 < m-- - k && lst.bool && !lst.bool2 && lst.space_print == 0 && lst.zero_print == 0)
+			str = ft_strjoin(str, " ");
+		m += 2;
+		//while (0 < m-- - j && !lst.bool2 && lst.zero_print == 0)
+		//	str = ft_strjoin(str, " ");
+	}
 	return (str);
 }
 
@@ -282,6 +298,7 @@ t_list    ft_check_mm(char *av, t_list lst, va_list ap)
 		n = va_arg(ap, int);
 		if (n < 0)
 		{
+			lst.bool = 1;
 			lst.t_flag = 1;
 			lst.min = -n;
 		}
@@ -292,7 +309,14 @@ t_list    ft_check_mm(char *av, t_list lst, va_list ap)
 	{
 		n = va_arg(ap, int);
 		if (n < 0)
+		{
+			lst.bool3 = 1;
+			if (lst.bool == 1)
+				lst.zero_print = 1;
+			else
+				lst.space_print = 1;
 			lst.max = 0;
+		}
 		else
 			lst.max = n;
 	}
@@ -358,6 +382,10 @@ char *ft_lst_init(char *av, va_list ap)
 	lst.period = 0;
 	lst.flag = '\0';
 	lst.zero_print = 0;
+	lst.space_print = 0;
+	lst.bool = 0;
+	lst.bool2 = 0;
+	lst.bool3 = 0;
 	str = (ft_lst_flag(((char*)av), ap, lst));
 	return (str);
 }
@@ -418,6 +446,6 @@ int     ft_printf(const char *av, ...)
 
 int main()
 {
-	ft_printf("aaaa%0*.*dna\n", -10, -20, -25556545);
-	printf("aaaa%0*.*dna\n", -10, -20, -25556545);
+	ft_printf("aaaa%0*.*dna\n", 40, 20, -25556545);
+	printf("aaaa%0*.*dna\n", 40, 20, -25556545);
 }
