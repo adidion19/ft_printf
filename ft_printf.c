@@ -198,7 +198,7 @@ int			ft_atoi(const char *str)
 	return ((int)i);
 }
 
-void	print_struct(t_list lst)
+/*void	print_struct(t_list lst)
 {
 	printf("%d\n", lst.zero_flag);
 	printf("%d\n", lst.t_flag);
@@ -208,6 +208,47 @@ void	print_struct(t_list lst)
 	printf("%c\n", lst.flag);
 	printf("%d\n", lst.zero_print);
 	printf("%d\n", lst.space_print);
+}*/
+
+char	*ft_convert_s_2(char *s, t_list lst)
+{
+	int i;
+	int k;
+	int m;
+	char *str;
+
+	i = ft_strlen(s) + 1;
+	if (!lst.bool && !lst.bool2)
+		k = lst.min;
+	if (lst.space_print == 1)
+		k = lst.min;
+	m = lst.min + 1;
+	while (0 < m-- - k && lst.t_flag == 1 && !lst.bool && (!lst.bool3 || lst.t_flag == 0))
+		str = ft_strjoin(str, " ");
+	while (0 <= ((k--) - i) && lst.zero_print == 0 && (!lst.bool3 || lst.t_flag == 0))
+		str = ft_strjoin(str, "0");
+	str = ft_strjoin(str, s);
+	k = lst.max;
+	i--;
+	if (lst.t_flag == 1 || lst.bool)
+	{
+		while (0 < m-- - i - k && (!lst.bool || lst.bool2))
+			str = ft_strjoin(str, " ");
+		m++;
+		while (0 < m-- - i && lst.bool && !lst.bool2)
+			str = ft_strjoin(str, " ");
+	}
+	return (str);
+}
+
+char	*ft_convert_s(t_list lst, va_list ap)
+{
+	char *str;
+	char *s;
+
+	s = va_arg(ap,char*);
+	str = ft_convert_s_2(s, lst);
+	return (str);					
 }
 
 char	*ft_convert_d_2(int n, t_list lst)
@@ -282,6 +323,8 @@ char *ft_flag(t_list lst, va_list ap)
 	str = 0;
 	if (lst.flag == 'd' || lst.flag == 'i')
 		str = (ft_convert_d(lst, ap));
+	if (lst.flag == 's')
+		str = (ft_convert_s(lst, ap));
 	return (str);
 }
 
@@ -452,6 +495,6 @@ int     ft_printf(const char *av, ...)
 
 int main()
 {
-	//ft_printf("aaaa%0*.*dna\n", -40, 20, -25556545);
-	printf("aaaa%0*.*sna\n", 40, -20, "abcd");
+	ft_printf("aaaa%*.*dna\n", 40, -20, "abcdef");
+	printf("aaaa%*.*dna\n", 40, -20, "abcdef");
 }
