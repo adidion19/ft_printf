@@ -198,7 +198,7 @@ int			ft_atoi(const char *str)
 	return ((int)i);
 }
 
-/*void	print_struct(t_list lst)
+void	print_struct(t_list lst)
 {
 	printf("%d\n", lst.zero_flag);
 	printf("%d\n", lst.t_flag);
@@ -207,7 +207,8 @@ int			ft_atoi(const char *str)
 	printf("%d\n", lst.period);
 	printf("%c\n", lst.flag);
 	printf("%d\n", lst.zero_print);
-}*/
+	printf("%d\n", lst.space_print);
+}
 
 char	*ft_convert_d_2(int n, t_list lst)
 {
@@ -254,9 +255,12 @@ char	*ft_convert_d_2(int n, t_list lst)
 		m += 1;
 		while (0 < m-- - k && lst.bool && !lst.bool2 && lst.space_print == 0 && lst.zero_print == 0)
 			str = ft_strjoin(str, " ");
-		m += 2;
-		//while (0 < m-- - j && !lst.bool2 && lst.zero_print == 0)
-		//	str = ft_strjoin(str, " ");
+		m += 1;
+		while (0 < m-- - j && !lst.bool && !lst.bool2 && lst.zero_print == 0 && lst.bool3)
+			str = ft_strjoin(str, " ");
+		m++;
+		while (0 < m-- - k && !lst.bool && !lst.bool2 && lst.space_print == 0 && !lst.bool3)
+			str = ft_strjoin(str, " ");
 	}
 	return (str);
 }
@@ -311,8 +315,10 @@ t_list    ft_check_mm(char *av, t_list lst, va_list ap)
 		if (n < 0)
 		{
 			lst.bool3 = 1;
-			if (lst.bool == 1 || lst.t_flag == 1)
+			if (lst.bool == 1)
 				lst.zero_print = 1;
+			else if (lst.t_flag == 1)
+				lst.space_print = 0;
 			else
 				lst.space_print = 1;
 			lst.max = 0;
@@ -446,6 +452,6 @@ int     ft_printf(const char *av, ...)
 
 int main()
 {
-	ft_printf("aaaa%-0*.*dna\n", 40, -20, -25556545);
-	printf("aaaa%-0*.*dna\n", 40, -20, -25556545);
+	//ft_printf("aaaa%0*.*dna\n", -40, 20, -25556545);
+	printf("aaaa%0*.*sna\n", 40, -20, "abcd");
 }
