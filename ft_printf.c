@@ -202,8 +202,8 @@ void	print_struct(t_list lst)
 {
 	printf("%d\n", lst.zero_flag);
 	printf("%d\n", lst.t_flag);
-	printf("%d\n", lst.max);
-	printf("%d\n", lst.min);
+	printf("|%d|\n", lst.max);
+	printf("|%d|\n", lst.min);
 	printf("%d\n", lst.period);
 	printf("%c\n", lst.flag);
 	printf("%d\n", lst.zero_print);
@@ -220,8 +220,10 @@ char	*ft_convert_s_2(char *s, t_list lst)
 	int m;
 	char *str;
 
-	if (lst.period == 1 && lst.max) // truc a gerer
-		i = 0;
+	
+	//print_struct(lst);
+	if (lst.max == 0 && !lst.bool5)
+		i = 1;
 	else
 		i = ft_strlen(s) + 1;
 	if (!lst.bool && !lst.bool2)
@@ -239,10 +241,10 @@ char	*ft_convert_s_2(char *s, t_list lst)
 	}
 	while (0 <= ((k--) - i) && lst.zero_print == 0 && (lst.t_flag == 0 || (lst.zero_flag && lst.bool3)) && (lst.zero_flag == 1 || lst.bool3 == 0))
 		str = ft_strjoin(str, "0");
-	if (i != 0)	
-		str = ft_strjoin(str, s);
 	k = lst.max;
 	m = lst.min;
+	if (i != 1)	
+		str = ft_strjoin(str, s);
 	i--;
 	if (lst.t_flag == 1 || lst.bool)
 	{
@@ -265,6 +267,59 @@ char	*ft_convert_s(t_list lst, va_list ap)
 	return (str);					
 }
 
+char	*ft_convert_c_2(char *s, t_list lst)
+{
+	int i;
+	int k;
+	int m;
+	char *str;
+
+	//printf("|%s|", s);
+	//print_struct(lst);
+	str = 0;
+	i = 2;
+	if (!lst.bool && !lst.bool2)
+		k = lst.min;
+	if (lst.space_print == 1)
+		k = lst.min;
+	m = lst.min;
+	if (lst. t_flag == 0)
+	{
+		while (0 < m-- - k && !lst.bool)
+			str = ft_strjoin(str, " ");
+		while (0 <= ((k--) - i) && lst.zero_print == 0 && !lst.zero_flag)
+			str = ft_strjoin(str, " ");
+		k++;
+	}
+	while (0 <= ((k--) - i) && lst.zero_print == 0 && (lst.t_flag == 0 || (lst.zero_flag && lst.bool3)) && (lst.zero_flag == 1 || lst.bool3 == 0))
+		str = ft_strjoin(str, "0");
+	k = lst.max;
+	m = lst.min;
+	str = ft_strjoin(str, s);
+	i--;
+	if (lst.t_flag == 1 || lst.bool)
+	{
+		while (0 < m-- - i && (!lst.bool || lst.bool2))
+			str = ft_strjoin(str, " ");
+		m++;
+		while (0 < m-- - i && lst.bool && !lst.bool2)
+			str = ft_strjoin(str, " ");
+	}
+	return (str);
+}
+
+char	*ft_convert_c(t_list lst, va_list ap)
+{
+	char *s;
+	char *str;
+
+	s = malloc(sizeof(2));
+	s[0] = va_arg(ap, int);
+	//s[1] = NULL;
+	str = ft_convert_c_2(s, lst);
+	return (str);
+}
+
 char	*ft_convert_d_2(int n, t_list lst)
 {
 	char *str;
@@ -282,17 +337,15 @@ char	*ft_convert_d_2(int n, t_list lst)
 	if (lst.t_flag == 1 && lst.zero_print == 1)
 		m -= (j < 0) ? j - 1: j - 2;
 	if (lst.t_flag == 0 && !lst.max && n >= 0)
-	{
 		m++;
-	}
 	if (lst.zero_flag == 0 && lst.bool3 == 1 && lst.zero_print == 1)
 	{
 		swap = m;
 		m = k;
 		k = swap;
 	}
-	if (lst.min && lst.period == 0 && lst.zero_flag == 1)
-		k--;
+	//if (lst.min && lst.period == 0 && lst.zero_flag == 1)
+	//	k--;
 	if (lst.min && lst.period == 0 && (lst.t_flag == 0 || lst.zero_flag == 0) && lst.max)
 		m -= 3;
 	if ((n < 0 || lst.max == 0) && lst.t_flag == 0 && (!lst.bool3 || lst.bool || lst.zero_flag == 1))
@@ -300,7 +353,10 @@ char	*ft_convert_d_2(int n, t_list lst)
 		if (lst.bool == 1 || lst.t_flag == 1 || lst.bool3 == 1)
 			k += 2;
 		else if(!lst.max && lst.t_flag == 0)
-		;
+		{
+			k += 3;
+			j += 3;
+		}
 		else
 			k += 1;
 	}
@@ -381,10 +437,12 @@ char *ft_flag(t_list lst, va_list ap)
 		str = (ft_convert_d(lst, ap));
 	if (lst.flag == 's')
 		str = (ft_convert_s(lst, ap));
+	if (lst.flag == 'c')
+		str = (ft_convert_c(lst, ap));
 	return (str);
 }
 
-size_t		ft_count(char *str)
+/*size_t		ft_count(char *str)
 {
 	size_t i;
 
@@ -392,7 +450,7 @@ size_t		ft_count(char *str)
 	while (str[i] >= '0' && str[i] <= '9')
 		i++;
 	return (i);
-}
+}*/
 
 t_list    ft_check_mm(char *av, t_list lst, va_list ap)
 {
@@ -416,6 +474,7 @@ t_list    ft_check_mm(char *av, t_list lst, va_list ap)
 		lst.zero_flag = 0;
 	if (av[i] == '*' && lst.period == 0)
 	{
+		lst.bool5 = 1;
 		n = va_arg(ap, int);
 		if (n < 0)
 		{
@@ -477,7 +536,7 @@ char *ft_lst_flag(char *av, va_list ap, t_list lst)
 
 	tab = "cspdiuxX%";
 	i = 0;
-	while (av[++i])
+	while (av[++i] && lst.flag == 0)
 	{
 		if (av[i] == '0')
 			lst.zero_flag = 1;
@@ -492,8 +551,8 @@ char *ft_lst_flag(char *av, va_list ap, t_list lst)
 			lst.period = 1;
 			lst.max = 0;
 		}
-		k = 0;
-		while (tab[k++])
+		k = -1;
+		while (tab[++k])
 		{
 			if (tab[k] == av[i])
 			{
@@ -534,6 +593,7 @@ char *ft_lst_init(char *av, va_list ap)
 	lst.bool2 = 0;
 	lst.bool3 = 0;
 	lst.bool4 = 0;
+	//lst.bool5 = 0;
 	str = (ft_lst_flag(((char*)av), ap, lst));
 	return (str);
 }
@@ -576,6 +636,7 @@ int     ft_printf(const char *av, ...)
 		{
 			s = ft_lst_init(((char*)av) + i, ap);
 			j += ft_strlen(s);
+			//printf("|%s|\n", s);
 			ft_putstr_fd(s, 1);
 			i += ft_sum_i(((char*)av) + i);
 		}
@@ -594,9 +655,9 @@ int     ft_printf(const char *av, ...)
 
 int main()
 {
-	ft_printf("aaa%-*.s55\n", 50, "abcdef");
-	   printf("aaa%-*.s55\n", 50, "abcdef");
-	
-
+	//ft_printf("aaa%.*daa\n", -25, 40, -20);
+	//   printf("aaa%.*daa\n", -25, 40, -20);
+	ft_printf("aaa%-.*c55\n", 10, 'b');
+	   printf("aaa%.*c55\n", 10, 'b');
 	printf("\nArrete de jouer a dofus\n");
 }
