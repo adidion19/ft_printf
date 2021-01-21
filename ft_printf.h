@@ -29,6 +29,8 @@ typedef struct  s_list
     int     bool;
     int     bool2;
     int     bool3;
+    int     bool4;
+    int     bool5;
 }               t_list;
 
 #endif

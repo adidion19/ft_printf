@@ -46,6 +46,78 @@ static char	*ft_strrev(char *str)
 	return (str);
 }
 
+int		check_base_2(int n, char *base)
+{
+	int i;
+	int j;
+
+	if (!base)
+		return (0);
+	i = -1;
+	while (base[++i])
+	{
+		j = -1;
+		while (base[++j])
+		{
+			if (i == j)
+				;
+			else if (base[i] == base[j])
+				return (0);
+		}
+	}
+	return (1);
+}
+
+int     check_base(int n, char *base)
+{
+	int count;
+	int i;
+
+	i = ft_strlen(base);
+	count = 0;
+	if (n < 0)
+	{
+		count++;
+		n = n * -1;
+	}
+	while (n >= ft_strlen(base))
+	{
+		n = n / ft_strlen(base);
+		count++;
+	}
+	count++;
+	return (count);
+}
+
+char    *ft_itoa_base(int n, char *base)
+{
+    char			*ans;
+	int				bool_;
+	unsigned int	a;
+	int				i;
+
+	bool_ = 1;
+	i = 0;
+	if (!(check_base_2(n, base)))
+		return (0);
+	if (!(ans = (char*)malloc(sizeof(char) * (check_base(n, base) + 1))))
+		return (0);
+	if (n < 0)
+		bool_ = 0;
+	a = (n >= 0) ? n : -n;
+	while (a >= ft_strlen(base))
+	{
+		ans[i++] = base[a % ft_strlen(base)];
+		a = a / ft_strlen(base);
+	}
+	ans[i++] = base[a % ft_strlen(base)];
+	if (bool_ == 0)
+		ans[i++] = '-';
+	ans[i] = '\0';
+	ft_strrev(ans);
+	return (ans);
+}
+
 static int	len_of_int(int n)
 {
 	int count;
@@ -65,26 +137,31 @@ static int	len_of_int(int n)
 	return (count);
 }
 
-char		*ft_itoa(int n)
+char    *ft_itoa_base(int n, char *base)
 {
-	char			*ans;
+    char			*ans;
 	int				bool_;
 	unsigned int	a;
 	int				i;
 
 	bool_ = 1;
 	i = 0;
-	if (!(ans = (char*)malloc(sizeof(char) * (len_of_int(n) + 1))))
+	if (!(check_base_2(n, base)))
 		return (0);
-	if (n < 0)
+	if (!(ans = (char*)malloc(sizeof(char) * (check_base(n, base) + 1))))
+		return (0);
+	if (n < 0 && n != -2147483648)
 		bool_ = 0;
-	a = (n >= 0) ? n : -n;
-	while (a >= 10)
+	if (n >= 0 || n != -2147483648) 
+		a = n;
+	else
+		a = -n;
+	while (a >= ft_strlen(base))
 	{
-		ans[i++] = a % 10 + 48;
-		a = a / 10;
+		ans[i++] = base[a % ft_strlen(base)];
+		a = a / ft_strlen(base);
 	}
-	ans[i++] = a % 10 + 48;
+	ans[i++] = base[a % ft_strlen(base)];
 	if (bool_ == 0)
 		ans[i++] = '-';
 	ans[i] = '\0';
