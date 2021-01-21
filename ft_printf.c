@@ -92,18 +92,14 @@ int     check_base(int n, char *base)
 char    *ft_itoa_base(int n, char *base)
 {
     char			*ans;
-	int				bool_;
 	unsigned int	a;
 	int				i;
 
-	bool_ = 1;
 	i = 0;
 	if (!(check_base_2(n, base)))
 		return (0);
 	if (!(ans = (char*)malloc(sizeof(char) * (check_base(n, base) + 1))))
 		return (0);
-	if (n < 0)
-		bool_ = 0;
 	a = (n >= 0) ? n : -n;
 	while (a >= ft_strlen(base))
 	{
@@ -111,8 +107,6 @@ char    *ft_itoa_base(int n, char *base)
 		a = a / ft_strlen(base);
 	}
 	ans[i++] = base[a % ft_strlen(base)];
-	if (bool_ == 0)
-		ans[i++] = '-';
 	ans[i] = '\0';
 	ft_strrev(ans);
 	return (ans);
@@ -137,31 +131,26 @@ static int	len_of_int(int n)
 	return (count);
 }
 
-char    *ft_itoa_base(int n, char *base)
+char		*ft_itoa(int n)
 {
-    char			*ans;
+	char			*ans;
 	int				bool_;
 	unsigned int	a;
 	int				i;
 
 	bool_ = 1;
 	i = 0;
-	if (!(check_base_2(n, base)))
+	if (!(ans = (char*)malloc(sizeof(char) * (len_of_int(n) + 1))))
 		return (0);
-	if (!(ans = (char*)malloc(sizeof(char) * (check_base(n, base) + 1))))
-		return (0);
-	if (n < 0 && n != -2147483648)
+	if (n < 0)
 		bool_ = 0;
-	if (n >= 0 || n != -2147483648) 
-		a = n;
-	else
-		a = -n;
-	while (a >= ft_strlen(base))
+	a = (n >= 0) ? n : -n;
+	while (a >= 10)
 	{
-		ans[i++] = base[a % ft_strlen(base)];
-		a = a / ft_strlen(base);
+		ans[i++] = a % 10 + 48;
+		a = a / 10;
 	}
-	ans[i++] = base[a % ft_strlen(base)];
+	ans[i++] = a % 10 + 48;
 	if (bool_ == 0)
 		ans[i++] = '-';
 	ans[i] = '\0';
@@ -504,6 +493,65 @@ char *ft_convert_d(t_list lst, va_list ap)
 	return (str);
 }
 
+char	*ft_convert_x_2(char *base, int n, t_list lst)
+{
+	int i;
+	int k;
+	int m;
+	char *str;
+
+	
+	//print_struct(lst);
+	if (lst.max == 0 && !lst.bool5)
+		i = 1;
+	else
+		i = ft_strlen(ft_itoa_base(n, base)) + 1;
+	if (!lst.bool && !lst.bool2)
+		k = lst.min + 1;
+	if (lst.space_print == 1)
+		k = lst.min;
+	m = lst.min - 1;
+	if (lst.t_flag == 0 && lst.space_print == 0)
+	{
+		while (0 < m-- - k)
+			str = ft_strjoin(str, " ");
+		m++;
+	}
+	/*while ((i + k >= m++) && lst.zero_print == 0 && lst.zero_flag == 0 && lst.t_flag == 0)
+		str = ft_strjoin(str, " ");
+	m += 3;
+	while ((k-- >= i) && lst.zero_print == 0 && (lst.zero_flag == 1 || lst.bool3 == 0 || (lst.bool == 0 && lst.bool3 == 0)))
+		str = ft_strjoin(str, "0");*/ // cette pertie c est de la merde
+	k = lst.max;
+	m = lst.min;
+	str = ft_strjoin(str, ft_itoa_base(n, base));
+	i--;
+	if (lst.t_flag == 1 || lst.bool)
+	{
+		while (0 < m-- - i && (!lst.bool || lst.bool2))
+			str = ft_strjoin(str, " ");
+		m++;
+		while (0 < m-- - i && lst.bool && !lst.bool2)
+			str = ft_strjoin(str, " ");
+	}
+	return (str);
+}
+
+char	*ft_convert_x(t_list lst, va_list ap)
+{
+	int n;
+	char *str;
+	char *base;
+
+	n = va_arg(ap, int);
+	if (lst.flag == 'x')
+		base = "0123456789abcdef";
+	else
+		base = "0123456789ABCDEF";
+	str = ft_convert_x_2(base, n, lst);
+	return (str);
+}
+
 char *ft_flag(t_list lst, va_list ap)
 {
 	char *str;
@@ -516,6 +564,8 @@ char *ft_flag(t_list lst, va_list ap)
 		str = (ft_convert_s(lst, ap));
 	if (lst.flag == 'c')
 		str = (ft_convert_c(lst, ap));
+	if (lst.flag == 'x' || lst.flag == 'X')
+		str = (ft_convert_x(lst, ap));
 	return (str);
 }
 
@@ -734,7 +784,7 @@ int main()
 {
 	//ft_printf("aaa%.*daa\n", -25, 40, -20);
 	//   printf("aaa%.*daa\n", -25, 40, -20);
-	ft_printf("aaa%-.*c55\n", 10, 'b');
-	   printf("aaa%.*c55\n", 10, 'b');
+	ft_printf("zzz%50.30Xzzz\n", 555555);
+	   printf("zzz%50.30Xzzz\n", 555555);
 	printf("\nArrete de jouer a dofus\n");
 }
