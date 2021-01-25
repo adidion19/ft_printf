@@ -70,19 +70,16 @@ int		check_base_2(int n, char *base)
 
 int     check_base(int n, char *base)
 {
-	int count;
+	unsigned long count;
+	unsigned int a;
 	int i;
 
 	i = ft_strlen(base);
+	a = n;
 	count = 0;
-	if (n < 0)
+	while (a >= ft_strlen(base))
 	{
-		count++;
-		n = n * -1;
-	}
-	while (n >= ft_strlen(base))
-	{
-		n = n / ft_strlen(base);
+		a = a / ft_strlen(base);
 		count++;
 	}
 	count++;
@@ -100,7 +97,48 @@ char    *ft_itoa_base(int n, char *base)
 		return (0);
 	if (!(ans = (char*)malloc(sizeof(char) * (check_base(n, base) + 1))))
 		return (0);
-	a = (n >= 0) ? n : -n;
+	a = n;
+	while (a >= ft_strlen(base))
+	{
+		ans[i++] = base[a % ft_strlen(base)];
+		a = a / ft_strlen(base);
+	}
+	ans[i++] = base[a % ft_strlen(base)];
+	ans[i] = '\0';
+	ft_strrev(ans);
+	return (ans);
+}
+
+int     check_base_l(int n, char *base)
+{
+	unsigned long		count;
+	unsigned long long	a;
+	int					i;
+
+	i = ft_strlen(base);
+	a = n;
+	count = 0;
+	while (a >= ft_strlen(base))
+	{
+		a = a / ft_strlen(base);
+		count++;
+	}
+	count++;
+	return (count);
+}
+
+char    *ft_itol_base(unsigned long long n, char *base)
+{
+    char					*ans;
+	unsigned long long		a;
+	int						i;
+
+	i = 0;
+	if (!(check_base_2(n, base)))
+		return (0);
+	if (!(ans = (char*)malloc(sizeof(char) * (check_base_l(n, base) + 1))))
+		return (0);
+	a = n;
 	while (a >= ft_strlen(base))
 	{
 		ans[i++] = base[a % ft_strlen(base)];
@@ -493,45 +531,175 @@ char *ft_convert_d(t_list lst, va_list ap)
 	return (str);
 }
 
-char	*ft_convert_x_2(char *base, int n, t_list lst)
+char	*ft_convert_p_2(char *base, long n, t_list lst)
 {
-	int i;
+	char *str;
+	int j;
 	int k;
 	int m;
-	char *str;
+	int swap;
 
-	
-	//print_struct(lst);
-	if (lst.max == 0 && !lst.bool5)
-		i = 1;
+	str = 0;
+	if (n == 0)
+		j = 4;
 	else
-		i = ft_strlen(ft_itoa_base(n, base)) + 1;
-	if (!lst.bool && !lst.bool2)
-		k = lst.min + 1;
+		j = ft_strlen(ft_itol_base(n, base)) + 3;
+	k = lst.max;
 	if (lst.space_print == 1)
 		k = lst.min;
-	m = lst.min - 1;
-	if (lst.t_flag == 0 && lst.space_print == 0)
-	{
-		while (0 < m-- - k)
-			str = ft_strjoin(str, " ");
+	m = lst.min - 2;
+	if (lst.t_flag == 1 && lst.zero_print == 1)
+		m -= (j < 0) ? j - 1: j - 2;
+	if (lst.t_flag == 0 && !lst.max && n >= 0)
 		m++;
+	if (lst.zero_flag == 0 && lst.bool3 == 1 && lst.zero_print == 1)
+	{
+		swap = m;
+		m = k;
+		k = swap;
 	}
-	/*while ((i + k >= m++) && lst.zero_print == 0 && lst.zero_flag == 0 && lst.t_flag == 0)
-		str = ft_strjoin(str, " ");
-	m += 3;
-	while ((k-- >= i) && lst.zero_print == 0 && (lst.zero_flag == 1 || lst.bool3 == 0 || (lst.bool == 0 && lst.bool3 == 0)))
-		str = ft_strjoin(str, "0");*/ // cette pertie c est de la merde
-	k = lst.max;
-	m = lst.min;
-	str = ft_strjoin(str, ft_itoa_base(n, base));
-	i--;
-	if (lst.t_flag == 1 || lst.bool)
+	//if (lst.min && lst.period == 0 && lst.zero_flag == 1)
+	//	k--;
+	if (lst.min && lst.period == 0 && (lst.t_flag == 0 || lst.zero_flag == 0) && lst.max)
+		m -= 3;
+	if ((n < 0 || lst.max == 0) && lst.t_flag == 0 && (!lst.bool3 || lst.bool || lst.zero_flag == 1))
 	{
-		while (0 < m-- - i && (!lst.bool || lst.bool2))
+		if (lst.bool == 1 || lst.t_flag == 1 || lst.bool3 == 1)
+			k += 2;
+		else if(!lst.max && lst.t_flag == 0)
+		{
+			//k += 6;
+			//j += 3;
+		}
+		else
+			k += 1;
+	}
+	if (lst.t_flag == 0 && lst.space_print == 0)
+		while (0 < m-- - j)
+			str = ft_strjoin(str, " ");
+	while (0 <= ((k--) - j) && lst.zero_print == 0 && lst.zero_flag == 0 && ((lst.bool3 == 1 && lst.bool == 1) || (!lst.bool && lst.bool3)) && lst.t_flag == 0)
+		str = ft_strjoin(str, " ");
+	k--;
+	if (!lst.bool3 || !lst.min)
+		k += 4;
+	str = ft_strjoin(str, "0x");
+	while (0 <= ((k--) - j) && lst.zero_print == 0 && (lst.zero_flag == 1 || lst.bool3 == 0 || (lst.bool == 0 && lst.bool3 == 0)))
+		str = ft_strjoin(str, "0");
+	str = ft_strjoin(str, ft_itol_base(n, base));
+	k = lst.max + 1;
+	j--;
+	if (lst.t_flag == 1 && !lst.max)
+		m--;
+	if (lst.t_flag == 1)
+	{
+		while (0 < m-- - j && lst.bool4)
 			str = ft_strjoin(str, " ");
 		m++;
-		while (0 < m-- - i && lst.bool && !lst.bool2)
+		while (0 < m-- - j - k && lst.space_print == 0 && lst.bool && !lst.bool2 && lst.zero_print == 1)
+			str = ft_strjoin(str, " ");
+		m += 1;
+		while (0 < m-- - k && lst.bool && !lst.bool2 && lst.space_print == 0 && lst.zero_print == 0 && lst.max)
+			str = ft_strjoin(str, " ");
+		m += 1;
+		j--;
+		while (0 < m-- - j && lst.bool && !lst.bool2 && lst.space_print == 0 && lst.zero_print == 0 && !lst.max)
+			str = ft_strjoin(str, " ");
+		j++;
+		m += 1;
+		while (0 < m-- - j && !lst.bool && !lst.bool2 && lst.zero_print == 0 && lst.bool3)
+			str = ft_strjoin(str, " ");
+		m++;
+		while (0 < m-- - k && !lst.bool && !lst.bool2 && lst.space_print == 0 && !lst.bool3)
+			str = ft_strjoin(str, " ");
+		m++;
+		while (0 < m-- - j && lst.bool3 && lst.bool && lst.zero_flag == 0)
+			str = ft_strjoin(str, " ");
+	}
+	return (str);
+}
+
+char	*ft_convert_x_2(char *base, long n, t_list lst)
+{
+	char *str;
+	int j;
+	int k;
+	int m;
+	int swap;
+
+	str = 0;
+	if (n == 0)
+		j = 1;
+	else
+		j = ft_strlen(ft_itoa_base(n, base)) + 1;
+	k = lst.max;
+	if (lst.space_print == 1)
+		k = lst.min;
+	m = lst.min;
+	if (lst.t_flag == 1 && lst.zero_print == 1)
+		m -= (j < 0) ? j - 1: j - 2;
+	if (lst.t_flag == 0 && !lst.max && n >= 0)
+		m++;
+	if (lst.zero_flag == 0 && lst.bool3 == 1 && lst.zero_print == 1)
+	{
+		swap = m;
+		m = k;
+		k = swap;
+	}
+	//if (lst.min && lst.period == 0 && lst.zero_flag == 1)
+	//	k--;
+	if (lst.min && lst.period == 0 && (lst.t_flag == 0 || lst.zero_flag == 0) && lst.max)
+		m -= 3;
+	if ((n < 0 || lst.max == 0) && lst.t_flag == 0 && (!lst.bool3 || lst.bool || lst.zero_flag == 1))
+	{
+		if (lst.bool == 1 || lst.t_flag == 1 || lst.bool3 == 1)
+			k += 2;
+		else if(!lst.max && lst.t_flag == 0)
+		{
+			//k += 6;
+		;	//j += 3;
+		}
+		else
+			k += 1;
+	}
+	if (lst.t_flag == 0 && lst.space_print == 0)
+		while (0 < m-- - j)
+			str = ft_strjoin(str, " ");
+	while (0 <= ((k--) - j) && lst.zero_print == 0 && lst.zero_flag == 0 && ((lst.bool3 == 1 && lst.bool == 1) || (!lst.bool && lst.bool3)) && lst.t_flag == 0)
+		str = ft_strjoin(str, " ");
+	k--;
+	if (!lst.bool3 || !lst.min)
+		k += 2;
+	while (0 <= ((k--) - j) && lst.zero_print == 0 && (lst.zero_flag == 1 || lst.bool3 == 0 || (lst.bool == 0 && lst.bool3 == 0)))
+		str = ft_strjoin(str, "0");
+	if (j != 1)
+	str = ft_strjoin(str, ft_itoa_base(n, base));
+	k = lst.max + 1;
+	j--;
+	if (lst.t_flag == 1 && !lst.max)
+		m--;
+	if (lst.t_flag == 1)
+	{
+		while (0 < m-- - j && lst.bool4)
+			str = ft_strjoin(str, " ");
+		m++;
+		while (0 < m-- - j - k && lst.space_print == 0 && lst.bool && !lst.bool2 && lst.zero_print == 1)
+			str = ft_strjoin(str, " ");
+		m += 1;
+		while (0 < m-- - k && lst.bool && !lst.bool2 && lst.space_print == 0 && lst.zero_print == 0 && lst.max)
+			str = ft_strjoin(str, " ");
+		m += 1;
+		j--;
+		while (0 < m-- - j && lst.bool && !lst.bool2 && lst.space_print == 0 && lst.zero_print == 0 && !lst.max)
+			str = ft_strjoin(str, " ");
+		j++;
+		m += 1;
+		while (0 < m-- - j && !lst.bool && !lst.bool2 && lst.zero_print == 0 && lst.bool3)
+			str = ft_strjoin(str, " ");
+		m++;
+		while (0 < m-- - k && !lst.bool && !lst.bool2 && lst.space_print == 0 && !lst.bool3)
+			str = ft_strjoin(str, " ");
+		m++;
+		while (0 < m-- - j && lst.bool3 && lst.bool && lst.zero_flag == 0)
 			str = ft_strjoin(str, " ");
 	}
 	return (str);
@@ -552,6 +720,18 @@ char	*ft_convert_x(t_list lst, va_list ap)
 	return (str);
 }
 
+char	*ft_convert_p(t_list lst, va_list ap)
+{
+	unsigned long long n;
+	char *str;
+	char *base;
+
+	n = va_arg(ap, unsigned long long);
+	base = "0123456789abcdef";
+	str = ft_convert_p_2(base, n, lst);
+	return (str);
+}
+
 char *ft_flag(t_list lst, va_list ap)
 {
 	char *str;
@@ -566,6 +746,8 @@ char *ft_flag(t_list lst, va_list ap)
 		str = (ft_convert_c(lst, ap));
 	if (lst.flag == 'x' || lst.flag == 'X')
 		str = (ft_convert_x(lst, ap));
+	if (lst.flag == 'p')
+		str = (ft_convert_p(lst, ap));
 	return (str);
 }
 
@@ -782,9 +964,14 @@ int     ft_printf(const char *av, ...)
 
 int main()
 {
+	int a;
+	void *ptr;
+
+	a = 5;
+	ptr = &a;
 	//ft_printf("aaa%.*daa\n", -25, 40, -20);
 	//   printf("aaa%.*daa\n", -25, 40, -20);
-	ft_printf("zzz%50.30Xzzz\n", 555555);
-	   printf("zzz%50.30Xzzz\n", 555555);
+	ft_printf("zzz%*.*pzzz\n", 52, 15, ptr);
+	   printf("zzz%*.*pzzz\n", 52, 15, ptr);
 	printf("\nArrete de jouer a dofus\n");
 }
