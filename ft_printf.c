@@ -418,8 +418,10 @@ char	*ft_convert_c(t_list lst, va_list ap)
 	char *str;
 
 	s = malloc(sizeof(2));
-	s[0] = va_arg(ap, int);
-	//s[1] = NULL;
+	if (lst.flag == '%')
+		s[0] = '%';
+	else
+		s[0] = va_arg(ap, int);
 	str = ft_convert_c_2(s, lst);
 	return (str);
 }
@@ -547,7 +549,9 @@ char	*ft_convert_p_2(char *base, long n, t_list lst)
 	k = lst.max;
 	if (lst.space_print == 1)
 		k = lst.min;
-	m = lst.min - 2;
+	m = lst.min - 2; // toucher aux m
+	if (!lst.period)
+		m += 2;
 	if (lst.t_flag == 1 && lst.zero_print == 1)
 		m -= (j < 0) ? j - 1: j - 2;
 	if (lst.t_flag == 0 && !lst.max && n >= 0)
@@ -586,7 +590,9 @@ char	*ft_convert_p_2(char *base, long n, t_list lst)
 	while (0 <= ((k--) - j) && lst.zero_print == 0 && (lst.zero_flag == 1 || lst.bool3 == 0 || (lst.bool == 0 && lst.bool3 == 0)))
 		str = ft_strjoin(str, "0");
 	str = ft_strjoin(str, ft_itol_base(n, base));
-	k = lst.max + 1;
+	k = lst.max;
+	if (!lst.period)
+		m += 2;
 	j--;
 	if (lst.t_flag == 1 && !lst.max)
 		m--;
@@ -608,8 +614,9 @@ char	*ft_convert_p_2(char *base, long n, t_list lst)
 		m += 1;
 		while (0 < m-- - j && !lst.bool && !lst.bool2 && lst.zero_print == 0 && lst.bool3)
 			str = ft_strjoin(str, " ");
+		j++;
 		m++;
-		while (0 < m-- - k && !lst.bool && !lst.bool2 && lst.space_print == 0 && !lst.bool3)
+		while (0 < m-- - j && !lst.bool && !lst.bool2 && lst.space_print == 0 && !lst.bool3)
 			str = ft_strjoin(str, " ");
 		m++;
 		while (0 < m-- - j && lst.bool3 && lst.bool && lst.zero_flag == 0)
@@ -742,7 +749,7 @@ char *ft_flag(t_list lst, va_list ap)
 		str = (ft_convert_d(lst, ap));
 	if (lst.flag == 's')
 		str = (ft_convert_s(lst, ap));
-	if (lst.flag == 'c')
+	if (lst.flag == 'c' || lst.flag == '%')
 		str = (ft_convert_c(lst, ap));
 	if (lst.flag == 'x' || lst.flag == 'X')
 		str = (ft_convert_x(lst, ap));
@@ -971,7 +978,7 @@ int main()
 	ptr = &a;
 	//ft_printf("aaa%.*daa\n", -25, 40, -20);
 	//   printf("aaa%.*daa\n", -25, 40, -20);
-	ft_printf("zzz%*.*pzzz\n", 52, 15, ptr);
-	   printf("zzz%*.*pzzz\n", 52, 15, ptr);
+	ft_printf("zzz%pzzz\n", ptr);
+	   printf("zzz%pzzz\n", ptr);
 	printf("\nArrete de jouer a dofus\n");
 }
