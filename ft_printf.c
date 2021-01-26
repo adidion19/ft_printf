@@ -12,13 +12,23 @@
 
 #include "ft_printf.h"
 
-size_t		ft_strlen(const char *str)
+unsigned int		ft_strlen(const char *str)
 {
-	size_t i;
+	unsigned int i;
 
 	i = 0;
 	if (!str)
 		return (0);
+	while (str[i])
+		i++;
+	return (i);
+}
+
+int			ft_strlen_2(char *str)
+{
+	int i;
+
+	i = 0;
 	while (str[i])
 		i++;
 	return (i);
@@ -46,7 +56,7 @@ static char	*ft_strrev(char *str)
 	return (str);
 }
 
-int		check_base_2(int n, char *base)
+int		check_base_2(char *base)
 {
 	int i;
 	int j;
@@ -93,7 +103,7 @@ char    *ft_itoa_base(int n, char *base)
 	int				i;
 
 	i = 0;
-	if (!(check_base_2(n, base)))
+	if (!(check_base_2(base)))
 		return (0);
 	if (!(ans = (char*)malloc(sizeof(char) * (check_base(n, base) + 1))))
 		return (0);
@@ -134,7 +144,7 @@ char    *ft_itol_base(unsigned long long n, char *base)
 	int						i;
 
 	i = 0;
-	if (!(check_base_2(n, base)))
+	if (!(check_base_2(base)))
 		return (0);
 	if (!(ans = (char*)malloc(sizeof(char) * (check_base_l(n, base) + 1))))
 		return (0);
@@ -302,7 +312,7 @@ int			ft_atoi(const char *str)
 	return ((int)i);
 }
 
-void	print_struct(t_list lst)
+/*void	print_struct(t_list lst)
 {
 	printf("%d\n", lst.zero_flag);
 	printf("%d\n", lst.t_flag);
@@ -315,6 +325,24 @@ void	print_struct(t_list lst)
 	printf("%d\n", lst.bool);
 	printf("%d\n", lst.bool2);
 	printf("%d\n", lst.bool3);
+}*/
+
+char	*ft_max(t_list lst, char *s, char *str)
+{
+	char temp[2];
+	int i;
+	int k;
+
+	str = 0;
+	i = 0;
+	k = lst.max;
+	while (k > i)
+	{
+		temp[0] = s[i];
+		str = ft_strjoin(str, temp);
+		i++;
+	}
+	return (str);
 }
 
 char	*ft_convert_s_2(char *s, t_list lst)
@@ -323,13 +351,15 @@ char	*ft_convert_s_2(char *s, t_list lst)
 	int k;
 	int m;
 	char *str;
-
 	
 	//print_struct(lst);
-	if (lst.max == 0 && !lst.bool5)
-		i = 1;
-	else
-		i = ft_strlen(s) + 1;
+	str = 0;
+	//if (lst.max == 0 && !lst.bool5)
+	//	i = 1;
+	//else
+	if (!s && (!lst.bool6 || lst.bool3))
+		s = "(null)";
+	i = ft_strlen(s) + 1;
 	if (!lst.bool && !lst.bool2)
 		k = lst.min;
 	if (lst.space_print == 1)
@@ -347,7 +377,9 @@ char	*ft_convert_s_2(char *s, t_list lst)
 		str = ft_strjoin(str, "0");
 	k = lst.max;
 	m = lst.min;
-	if (i != 1)	
+	if (i != 1 && ft_strlen_2(s) > lst.max && lst.max)
+		str = ft_max(lst, s, str);
+	else if (i != 1)	
 		str = ft_strjoin(str, s);
 	i--;
 	if (lst.t_flag == 1 || lst.bool)
@@ -366,9 +398,9 @@ char	*ft_convert_s(t_list lst, va_list ap)
 	char *str;
 	char *s;
 
-	s = va_arg(ap,char*);
+	s = va_arg(ap, char*);
 	str = ft_convert_s_2(s, lst);
-	return (str);					
+	return (str);
 }
 
 char	*ft_convert_c_2(char *s, t_list lst)
@@ -483,9 +515,7 @@ char	*ft_convert_d_2(int n, t_list lst)
 	}
 	while (0 <= ((k--) - j) && lst.zero_print == 0 && (lst.zero_flag == 1 || lst.bool3 == 0 || (lst.bool == 0 && lst.bool3 == 0)))
 		str = ft_strjoin(str, "0");
-	if (n == 0)
-		str = ft_strjoin(str, " ");
-	else if (n == -2147483648)
+	if (n == -2147483648)
 		str = ft_strjoin(str, "2147483648");
 	else
 	{
@@ -679,7 +709,7 @@ char	*ft_convert_x_2(char *base, long n, t_list lst)
 	while (0 <= ((k--) - j) && lst.zero_print == 0 && (lst.zero_flag == 1 || lst.bool3 == 0 || (lst.bool == 0 && lst.bool3 == 0)))
 		str = ft_strjoin(str, "0");
 	if (j != 1)
-	str = ft_strjoin(str, ft_itoa_base(n, base));
+		str = ft_strjoin(str, ft_itoa_base(n, base));
 	k = lst.max + 1;
 	j--;
 	if (lst.t_flag == 1 && !lst.max)
@@ -723,6 +753,7 @@ char	*ft_convert_x(t_list lst, va_list ap)
 		base = "0123456789abcdef";
 	else
 		base = "0123456789ABCDEF";
+	str = 0;
 	str = ft_convert_x_2(base, n, lst);
 	return (str);
 }
@@ -990,7 +1021,10 @@ char *ft_lst_flag(char *av, va_list ap, t_list lst)
 		}
 	}
 	if (lst.period == 1 && !lst.max)
+	{
 		lst.period = 0;
+		lst.bool6 = 1;
+	}
 	str = ft_flag(lst, ap);
 	return (str);
 }
@@ -1013,6 +1047,7 @@ char *ft_lst_init(char *av, va_list ap)
 	lst.bool3 = 0;
 	lst.bool4 = 0;
 	//lst.bool5 = 0;
+	lst.bool6 = 0;
 	str = (ft_lst_flag(((char*)av), ap, lst));
 	return (str);
 }
@@ -1068,20 +1103,4 @@ int     ft_printf(const char *av, ...)
 	}
 	va_end(ap);
 	return (j);
-}
-
-#include <stdio.h>
-
-int main()
-{
-	int a;
-	void *ptr;
-
-	a = 5;
-	ptr = &a;
-	//ft_printf("aaa%.*daa\n", -25, 40, -20);
-	//   printf("aaa%.*daa\n", -25, 40, -20);
-	ft_printf("zzz%-*.*uzzz\n", 50, -20, 5489);
-	   printf("zzz%-*.*uzzz\n", 50, -20, 5489);
-	printf("\nArrete de jouer a dofus\n");
 }
