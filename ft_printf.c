@@ -312,7 +312,7 @@ int			ft_atoi(const char *str)
 	return ((int)i);
 }
 
-void	print_struct(t_list lst)
+/*void	print_struct(t_list lst)
 {
 	printf("%d\n", lst.zero_flag);
 	printf("%d\n", lst.t_flag);
@@ -325,7 +325,7 @@ void	print_struct(t_list lst)
 	printf("%d\n", lst.bool);
 	printf("%d\n", lst.bool2);
 	printf("%d\n", lst.bool3);
-}
+}*/
 
 char	*ft_max(t_list lst, char *s, char *str)
 {
@@ -476,7 +476,7 @@ char	*ft_convert_d_2(int n, t_list lst)
 		k = lst.min - 2;
 	m = lst.min;
 	if (lst.t_flag == 1 && lst.zero_print == 1)
-		m -= (j < 0) ? j - 1: j - 2;
+		m -= (j < 0) ? j - 1 : j - 2;
 	if (lst.t_flag == 0 && !lst.max && n >= 0)
 		m++;
 	if (lst.zero_flag == 0 && lst.bool3 == 1 && lst.zero_print == 1)
@@ -485,8 +485,8 @@ char	*ft_convert_d_2(int n, t_list lst)
 		m = k;
 		k = swap;
 	}
-	if (lst.min && lst.period == 0 && lst.zero_flag == 1)
-		k--;
+	//if (lst.min && lst.period == 0 && lst.zero_flag == 1)
+	//	k--;
 	if (lst.min && lst.period == 0 && (lst.t_flag == 0 || lst.zero_flag == 0) && lst.max)
 		m -= 3;
 	if ((n < 0 || lst.max == 0) && lst.t_flag == 0 && (!lst.bool3 || lst.bool || lst.zero_flag == 1))
@@ -495,7 +495,7 @@ char	*ft_convert_d_2(int n, t_list lst)
 			k += 2;
 		if (lst.min == 1 && lst.max == 0 && lst.bool7 == 1 && !lst.t_flag)
 		{
-			k += j + 1;
+			k += (n < 0) ? j - 1: j;
 			j++;
 		}
 		else if(!lst.max && lst.t_flag == 0)
@@ -506,6 +506,9 @@ char	*ft_convert_d_2(int n, t_list lst)
 		else
 			k += 1;
 	}
+	swap = 0;
+	//if (n >= 0 && lst.zero_print == 0 && lst.zero_flag == 1 && lst.t_flag == 0 && !lst.bool && !lst.bool3 && lst.max && !lst.bool7)
+	//	j--;
 	if (n < 0 && lst.t_flag == 1)
 		j--;
 	if (lst.t_flag == 0 && lst.space_print == 0)
@@ -517,19 +520,26 @@ char	*ft_convert_d_2(int n, t_list lst)
 	if (n < 0)
 	{
 		str = ft_strjoin(str, "-");
-		if (n < 0)
-			m--;
+	//	k--;
+		m--;
 		n = -n;
+		swap = 1;
 	}
-	while (0 <= ((k--) - j) && lst.zero_print == 0 && (lst.zero_flag == 1 || lst.bool3 == 0 || (lst.bool == 0 && lst.bool3 == 0)))
+	while (0 <= ((k--) - j) && lst.zero_print == 0 && ((lst.zero_flag == 1 && (!lst.bool || lst.period)) || (lst.bool3 == 0 && lst.min && (!lst.bool || lst.period)) || (lst.bool == 0 && lst.bool3 == 0)))
 		str = ft_strjoin(str, "0");
 	if (n == -2147483648)
 		str = ft_strjoin(str, "2147483648");
 	else if (n == 0 && (lst.bool6 && !lst.max && lst.min))
 		str = ft_strjoin(str, " ");
-	else if (n != 0 || ((lst.min || !lst.bool6) || (lst.min && !lst.max)))
+	else if (n != 0 || (lst.min || !lst.bool6) || (lst.min && !lst.max) || (!lst.max && lst.bool3))
 		str = ft_strjoin(str, ft_itoa(n));
+	if (swap == 1 && lst.zero_print == 0 && lst.zero_flag == 1 && lst.t_flag == 0 && !lst.bool && !lst.bool3 && lst.max && !lst.bool7)
+		j++;
 	k = lst.max;
+	if (lst.zero_flag == 0 && lst.period == 0 && lst.bool == 1 && lst.t_flag == 1)
+		m = (lst.t_flag) ? lst.min : lst.min - 1;
+	if (swap == 1 && lst.zero_flag == 0 && lst.period == 0 && lst.bool == 1 && lst.t_flag == 1)
+		m--;
 	j--;
 	if (lst.t_flag == 1 && !lst.max)
 		m--;
@@ -541,10 +551,11 @@ char	*ft_convert_d_2(int n, t_list lst)
 		while (0 < m-- - j - k && lst.space_print == 0 && lst.bool && !lst.bool2 && lst.zero_print == 1)
 			str = ft_strjoin(str, " ");
 		m += 1;
-		while (0 < m-- - k && lst.bool && !lst.bool2 && lst.space_print == 0 && lst.zero_print == 0 && lst.max)
+		j++;
+		while (0 < m-- - j && lst.bool && !lst.bool2 && lst.space_print == 0 && lst.zero_print == 0 && lst.max)
 			str = ft_strjoin(str, " ");
 		m += 1;
-		j--;
+		j -= 2;
 		while (0 < m-- - j && lst.bool && !lst.bool2 && lst.space_print == 0 && lst.zero_print == 0 && !lst.max)
 			str = ft_strjoin(str, " ");
 		j++;
@@ -552,9 +563,25 @@ char	*ft_convert_d_2(int n, t_list lst)
 		while (0 < m-- - j && !lst.bool && !lst.bool2 && lst.zero_print == 0 && lst.bool3)
 			str = ft_strjoin(str, " ");
 		m++;
-		while (0 < m-- - k && !lst.bool && !lst.bool2 && lst.space_print == 0 && !lst.bool3)
-			str = ft_strjoin(str, " ");
-		m++;
+		if (!lst.bool && lst.t_flag)
+		{
+			if (lst.max)
+				j++;
+			else
+				j--;
+			while (0 < m-- - j && !lst.bool && !lst.bool2 && lst.space_print == 0 && !lst.bool3)
+				str = ft_strjoin(str, " ");
+			if (lst.max)
+				j--;
+			else
+				j++;
+		}
+		else
+		{
+			while (0 < m-- - k && !lst.bool && !lst.bool2 && lst.space_print == 0 && !lst.bool3)
+					str = ft_strjoin(str, " ");
+			m++;
+		}
 		while (0 < m-- - j && lst.bool3 && lst.bool && lst.zero_flag == 0)
 			str = ft_strjoin(str, " ");
 	}
@@ -929,8 +956,6 @@ t_list    ft_check_mm(char *av, t_list lst, va_list ap)
 	}
 	if (av[i] >= '1' && av[i] <= '9' && !lst.period && lst.min == 0)
 		lst.min = ft_atoi(av + i);
-	if (lst.zero_flag == 1 && lst.t_flag == 1)
-		lst.zero_flag = 0;
 	if (av[i] == '*' && lst.period == 0)
 	{
 		lst.bool5 = 1;
@@ -980,6 +1005,11 @@ t_list    ft_check_mm(char *av, t_list lst, va_list ap)
 			else
 				lst.max = n;
 		}
+	}
+	if (lst.zero_flag == 1 && lst.t_flag == 1)
+	{
+		lst.bool8 = 1;
+		lst.zero_flag = 0;
 	}
 	if (lst.zero_flag == 1 && lst.period == 0 && lst.min && lst.bool4 == 0)
 		lst.max = lst.min;
@@ -1034,8 +1064,8 @@ char *ft_lst_flag(char *av, va_list ap, t_list lst)
 		lst.period = 0;
 		lst.bool6 = 1;
 	}
-	if (lst.bool3 && lst.period && lst.zero_flag)
-		printf("A");//lst.zero_print = 1;
+	//if (lst.bool3 && !lst.period && lst.zero_flag)
+	//	lst.zero_print = 1;
 	str = ft_flag(lst, ap);
 	return (str);
 }
@@ -1060,6 +1090,7 @@ char *ft_lst_init(char *av, va_list ap)
 	//lst.bool5 = 0;
 	lst.bool6 = 0;
 	lst.bool7 = 0;
+	lst.bool8 = 0;
 	str = (ft_lst_flag(((char*)av), ap, lst));
 	return (str);
 }
