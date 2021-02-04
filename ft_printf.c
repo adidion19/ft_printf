@@ -312,19 +312,19 @@ int			ft_atoi(const char *str)
 	return ((int)i);
 }
 
-/*void ft_printfstruct(t_list lst)
-{
-    printf("%c\n", lst.flag);
-    printf("%d\n", lst.t_flag);
-    printf("%d\n", lst.zero_flag);
-    printf("%d\n", lst.zero_print);
-    printf("%d\n", lst.space_print);
-    printf("|%d|\n", lst.min);
-    printf("%d\n", lst.emin);
-    printf("%d\n", lst.emax);
-    printf("%d\n", lst.max);
-    printf("|%d|\n", lst.period);
-}*/
+//void ft_printfstruct(t_list lst)
+//{
+//    printf("%c\n", lst.flag);
+//    printf("%d\n", lst.t_flag);
+//    printf("%d\n", lst.zero_flag);
+//    printf("%d\n", lst.zero_print);
+//    printf("%d\n", lst.space_print);
+//    printf("|%d|\n", lst.min);
+//    printf("%d\n", lst.emin);
+//    printf("%d\n", lst.emax);
+//    printf("|%d|\n", lst.max);
+//    printf("%d\n", lst.period);
+//}
 
 char	*ft_max(t_list lst, char *s, char *str)
 {
@@ -332,13 +332,12 @@ char	*ft_max(t_list lst, char *s, char *str)
 	int i;
 	int k;
 
-	str = 0;
 	i = 0;
 	k = lst.max;
 	while (k > i)
 	{
 		temp[0] = s[i];
-		temp[1] = 1;
+		temp[1] = 0;
 		str = ft_strjoin(str, temp);
 		i++;
 	}
@@ -349,36 +348,32 @@ char	*ft_convert_s_2(char *s, t_list lst)
 {
 	char *str;
 	int j;
-	int k;
 	int m;
 
 	str = 0;
+	//ft_printfstruct(lst);
 	j = ft_strlen(s);
-	if (lst.max >= j)
+	//printf("||%d||\n", j);
+	//if (lst.max <= j)
+	//	j = lst.max;
+	//printf("||%d||\n", j);
+	if (lst.max <= j && lst.max)
 		m = lst.min - lst.max;
+	else if (!lst.max && lst.period && lst.min && !lst.bool)
+		m = lst.min;
 	else
 		m = lst.min - j;
-	if (!m)
-		k = lst.max - j;
-	else
-		k = lst.max - j;
-	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
-	{
-		k = m;
-		m = 0;
-	}
+	//printf("||%d||\n", m);
 	if (!lst.t_flag)
 		while (m-- > 0)
 			str = ft_strjoin(str, " ");
-	while (k-- > 0)
-		str = ft_strjoin(str, "0");
-	if (s == NULL)
-	{
-		str = ft_strjoin(str, "");
-	}
-	else if (j != 1 && ft_strlen_2(s) > lst.max && lst.max)
+	//if (s == NULL)
+	//{
+	//	str = ft_strjoin(str, NULL);
+	//}
+	if (j != 0 && ft_strlen_2(s) > lst.max && lst.max)
 		str = ft_max(lst, s, str);
-	else if (j != 1)
+	else if (j != 0 && (lst.max || !lst.period || lst.bool))
 		str = ft_strjoin(str, s);
 	if (lst.t_flag)
 		while (m-- > 0)
