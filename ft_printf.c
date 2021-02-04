@@ -326,6 +326,76 @@ int			ft_atoi(const char *str)
     printf("|%d|\n", lst.period);
 }*/
 
+char	*ft_max(t_list lst, char *s, char *str)
+{
+	char temp[2];
+	int i;
+	int k;
+
+	str = 0;
+	i = 0;
+	k = lst.max;
+	while (k > i)
+	{
+		temp[0] = s[i];
+		temp[1] = 1;
+		str = ft_strjoin(str, temp);
+		i++;
+	}
+	return (str);
+}
+
+char	*ft_convert_s_2(char *s, t_list lst)
+{
+	char *str;
+	int j;
+	int k;
+	int m;
+
+	str = 0;
+	j = ft_strlen(s);
+	if (lst.max >= j)
+		m = lst.min - lst.max;
+	else
+		m = lst.min - j;
+	if (!m)
+		k = lst.max - j;
+	else
+		k = lst.max - j;
+	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
+	{
+		k = m;
+		m = 0;
+	}
+	if (!lst.t_flag)
+		while (m-- > 0)
+			str = ft_strjoin(str, " ");
+	while (k-- > 0)
+		str = ft_strjoin(str, "0");
+	if (s == NULL)
+	{
+		str = ft_strjoin(str, "");
+	}
+	else if (j != 1 && ft_strlen_2(s) > lst.max && lst.max)
+		str = ft_max(lst, s, str);
+	else if (j != 1)
+		str = ft_strjoin(str, s);
+	if (lst.t_flag)
+		while (m-- > 0)
+			str = ft_strjoin(str, " ");
+    return (str);
+}
+
+char	*ft_convert_s(t_list lst, va_list ap)
+{
+	char *str;
+	char *s;
+
+	s = va_arg(ap, char*);
+	str = ft_convert_s_2(s, lst);
+	return (str);
+}
+
 char	*ft_convert_d_2(int n, t_list lst)
 {
     char *str;
@@ -334,18 +404,19 @@ char	*ft_convert_d_2(int n, t_list lst)
 	int m;
 
     str = 0;
-	//ft_printfstruct(lst);
-		j = ft_strlen(ft_itoa(n));
-	if (lst.min > lst.max)
-		m = lst.min - j;
+	j = ft_strlen(ft_itoa(n));
+	if (lst.max >= j)
+		m = lst.min - lst.max;
 	else
-		m = lst.min - lst.max - j;
-	if (!m) // plus qu a mettre une conditon du genre : if (lst.min > lst.max)
+		m = lst.min - j;
+	if (!m)
 		k = lst.max - j;
 	else
 		k = lst.max - j;
 	if (n < 0)
 		k++;
+	if (lst.max >= j && n < 0)
+		m--;
 	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
 	{
 		k = m;
@@ -393,8 +464,8 @@ char *ft_flag(t_list lst, va_list ap)
 	str = 0;
 	if (lst.flag == 'd' || lst.flag == 'i')
 		str = (ft_convert_d(lst, ap));
-	//else if (lst.flag == 's')
-	//	str = (ft_convert_s(lst, ap));
+	else if (lst.flag == 's')
+		str = (ft_convert_s(lst, ap));
 	//else if (lst.flag == 'c' || lst.flag == '%')
 	//	str = (ft_convert_c(lst, ap));
 	//else if (lst.flag == 'x' || lst.flag == 'X')
