@@ -534,22 +534,11 @@ char			*ft_convert_d(t_list lst, va_list ap)
 	return (ft_convert_d_2(n, lst));
 }
 
-char			*ft_convert_p_2(char *base, long n, t_list lst)
+int				ft_convert_p_4(int m, int j, t_list lst)
 {
-	char	*str;
-	int		j;
-	int		k;
-	int		m;
+	int k;
 
-	str = ft_itol_base(n, base);
-	if (n == 0 && lst.min && lst.period && !lst.max)
-		j = 0;
-	else
-		j = ft_strlen(str);
-	if (lst.max >= j)
-		m = lst.min - lst.max - 2;
-	else
-		m = lst.min - j - 2;
+	k = 0;
 	if (!m)
 		k = lst.max - j;
 	else
@@ -559,15 +548,41 @@ char			*ft_convert_p_2(char *base, long n, t_list lst)
 		k = m;
 		m = 0;
 	}
+	return (k);
+}
+
+int				ft_convert_p_3(int j, t_list lst)
+{
+	int m;
+
+	m = 0;
+	if (lst.max >= j)
+		m = lst.min - lst.max - 2;
+	else
+		m = lst.min - j - 2;
+	return (m);
+}
+
+char			*ft_convert_p_2(char *base, long n, t_list lst)
+{
+	char	*str;
+	int		j;
+	int		k;
+	int		m;
+
+	str = ft_itol_base(n, base);
+	j = ft_strlen(str);
+	if (n == 0 && lst.min && lst.period && !lst.max)
+		j = 0;
+	m = ft_convert_p_3(j, lst);
+	k = ft_convert_p_4(m, j, lst);
 	if (!lst.t_flag)
 		while (m-- > 0)
 			ft_putchar_fd(' ', 1);
 	ft_putstr_fd("0x", 1);
 	while (k-- > 0)
 		ft_putchar_fd('0', 1);
-	if (n == 0 && lst.period && (!lst.max && !lst.bool))
-		;
-	else
+	if (!(n == 0 && lst.period && (!lst.max && !lst.bool)))
 		ft_putstr_fd(str, 1);
 	if (lst.t_flag)
 		while (m-- > 0)
@@ -588,6 +603,20 @@ char			*ft_convert_p(t_list lst, va_list ap)
 	return (str);
 }
 
+int				ft_convert_c_3(int j, t_list lst)
+{
+	int m;
+
+	m = 0;
+	if (lst.max <= j && lst.max)
+		m = lst.min - lst.max;
+	else if (!lst.max && lst.period && lst.min && !lst.bool)
+		m = lst.min;
+	else
+		m = lst.min - j;
+	return (m);
+}
+
 char			*ft_convert_c_2(char c, t_list lst)
 {
 	char	*str;
@@ -597,12 +626,7 @@ char			*ft_convert_c_2(char c, t_list lst)
 
 	str = 0;
 	j = 1;
-	if (lst.max <= j && lst.max)
-		m = lst.min - lst.max;
-	else if (!lst.max && lst.period && lst.min && !lst.bool)
-		m = lst.min;
-	else
-		m = lst.min - j;
+	m = ft_convert_c_3(j, lst);
 	k = 0;
 	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
 	{
@@ -696,10 +720,9 @@ t_list			ft_star(t_list lst, va_list ap)
 		lst.emin = 1;
 		n = va_arg(ap, int);
 		if (n < 0)
-		{
 			lst = ft_t_flag(lst);
+		if (n < 0)
 			lst.min = -n;
-		}
 		else
 			lst.min = n;
 	}
@@ -708,10 +731,9 @@ t_list			ft_star(t_list lst, va_list ap)
 		lst.emax = 1;
 		n = va_arg(ap, int);
 		if (n < 0)
-		{
 			lst.max = 0;
+		if (n < 0)
 			lst.bool = 1;
-		}
 		else
 			lst.max = n;
 	}
@@ -748,49 +770,58 @@ t_list			ft_read_flag(t_list lst, char *av, int i)
 	return (lst);
 }
 
+t_list			ft_period(t_list lst)
+{
+	lst.period = 1;
+	if (lst.zero_flag && !lst.emin)
+	{
+		lst.min = 0;
+		lst.emin = 1;
+		lst.zero_flag = 0;
+	}
+	return (lst);
+}
+
+t_list			ft_flag_2(t_list lst)
+{
+	lst.max = 0;
+	lst.emax = 1;
+	lst.zero_flag = 0;
+	return (lst);
+}
+
+t_list			ft_flag_1(t_list lst)
+{
+	lst.min = 0;
+	lst.emin = 1;
+	lst.zero_flag = 0;
+	return (lst);
+}
+
 char			*ft_lst_flag(char *av, va_list ap, t_list lst)
 {
 	int i;
 
 	i = 0;
 	while (av[++i] && lst.flag == 0)
-	{
 		if (av[i] == '-')
 			lst = ft_t_flag(lst);
 		else if (av[i] == '0' && !lst.period)
 			lst = ft_zero_flag(lst);
 		else if (av[i] >= '0' && av[i] <= '9')
-		{
 			lst = ft_mm_flag(lst, ((char*)av) + i);
-		}
 		else if (av[i] == '.')
-		{
-			lst.period = 1;
-			if (lst.zero_flag && !lst.emin)
-			{
-				lst.min = 0;
-				lst.emin = 1;
-				lst.zero_flag = 0;
-			}
-		}
+			lst = ft_period(lst);
 		else if (av[i] == '*')
 			lst = ft_star(lst, ap);
-		lst = ft_read_flag(lst, av, i);
-	}
+		else
+			lst = ft_read_flag(lst, av, i);
 	if (lst.flag == 0)
 		return (0);
 	if (lst.zero_flag && !lst.emax && lst.period)
-	{
-		lst.max = 0;
-		lst.emax = 1;
-		lst.zero_flag = 0;
-	}
+		lst = ft_flag_2(lst);
 	else if (lst.zero_flag && !lst.emin)
-	{
-		lst.min = 0;
-		lst.emin = 1;
-		lst.zero_flag = 0;
-	}
+		lst = ft_flag_1(lst);
 	return (ft_flag(lst, ap));
 }
 
