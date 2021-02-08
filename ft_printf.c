@@ -206,54 +206,10 @@ char			*ft_itoa(int n)
 	return (ans);
 }
 
-char			*ft_strdup(const char *src)
+int				ft_putchar_fd(char c, int fd)
 {
-	int		i;
-	char	*dest;
-
-	i = 0;
-	while (src[i])
-		i++;
-	if (!(dest = malloc(sizeof(char) * (i + 1))))
-		return (0);
-	i = -1;
-	while (src[++i])
-		dest[i] = src[i];
-	dest[i] = '\0';
-	return (dest);
-}
-
-char			*ft_strjoin(char const *s1, char const *s2)
-{
-	int		i;
-	int		j;
-	int		len;
-	char	*str;
-
-	i = -1;
-	if (!s1 && !s2)
-		return (0);
-	if (!s1)
-		return (ft_strdup((char*)s2));
-	if (!s2)
-		return (ft_strdup((char*)s1));
-	len = ft_strlen((char*)s1) + ft_strlen((char*)s2);
-	if (!(str = malloc(sizeof(char) * (len + 1))))
-		return (0);
-	while (s1[++i])
-		str[i] = s1[i];
-	j = i;
-	i = -1;
-	while (s2[++i])
-		str[j++] = s2[i];
-	str[j] = '\0';
-	return (str);
-}
-
-int			ft_putchar_fd(char c, int fd)
-{
-	static int i;
-	int z;
+	static int	i;
+	int			z;
 
 	z = 0;
 	if (fd == -6)
@@ -359,10 +315,8 @@ char			*ft_convert_x_2(char *base, long n, t_list lst)
 	int		k;
 	int		m;
 
-	str = 0;
-	if (lst.max > 1000 || lst.min > 1000)
-		return (0);
-	j = ft_strlen(ft_itoa_base(n, base));
+	str = ft_itoa_base(n, base);
+	j = ft_strlen(str);
 	if (lst.max >= j)
 		m = lst.min - lst.max;
 	else
@@ -389,11 +343,12 @@ char			*ft_convert_x_2(char *base, long n, t_list lst)
 			ft_putchar_fd(' ', 1);
 	}
 	else
-		ft_putstr_fd(ft_itoa_base(n, base), 1);
+		ft_putstr_fd(str, 1);
 	if (lst.t_flag)
 		while (m-- > 0)
 			ft_putchar_fd(' ', 1);
-	return (str);
+	free(str);
+	return (0);
 }
 
 char			*ft_convert_x(t_list lst, va_list ap)
@@ -419,8 +374,8 @@ char			*ft_convert_u_2(char *base, unsigned int n, t_list lst)
 	int		k;
 	int		m;
 
-	str = 0;
-	j = ft_strlen(ft_itoa_base(n, base));
+	str = ft_itoa_base(n, base);
+	j = ft_strlen(str);
 	if (lst.max >= j)
 		m = lst.min - lst.max;
 	else
@@ -447,11 +402,12 @@ char			*ft_convert_u_2(char *base, unsigned int n, t_list lst)
 			ft_putchar_fd(' ', 1);
 	}
 	else
-		ft_putstr_fd(ft_itoa_base(n, base), 1);
+		ft_putstr_fd(str, 1);
 	if (lst.t_flag)
 		while (m-- > 0)
 			ft_putchar_fd(' ', 1);
-	return (str);
+	free(str);
+	return (0);
 }
 
 char			*ft_convert_u(t_list lst, va_list ap)
@@ -471,6 +427,7 @@ char			*ft_convert_s_2(char *s, t_list lst)
 	char	*str;
 	int		j;
 	int		m;
+	int		k;
 
 	str = 0;
 	if (s == NULL)
@@ -482,9 +439,17 @@ char			*ft_convert_s_2(char *s, t_list lst)
 		m = lst.min;
 	else
 		m = lst.min - j;
+	k = 0;
+	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
+	{
+		k = m;
+		m = 0;
+	}
 	if (!lst.t_flag)
 		while (m-- > 0)
 			ft_putchar_fd(' ', 1);
+	while (k-- > 0)
+		ft_putchar_fd('0', 1);
 	if (j != 0 && ft_strlen_2(s) > lst.max && lst.max)
 		str = ft_max(lst, s, str);
 	else if (j != 0 && (lst.max || !lst.period || lst.bool))
@@ -507,13 +472,14 @@ char			*ft_convert_s(t_list lst, va_list ap)
 
 char			*ft_convert_d_2(int n, t_list lst)
 {
-	char	*str;
+	char	*s;
 	int		j;
 	int		k;
 	int		m;
 
-	str = 0;
-	j = ft_strlen(ft_itoa(n));
+	s = ft_itoa(n);
+	j = ft_strlen(s);
+	free(s);
 	if (lst.max >= j)
 		m = lst.min - lst.max;
 	else
@@ -541,6 +507,7 @@ char			*ft_convert_d_2(int n, t_list lst)
 	}
 	while (k-- > 0)
 		ft_putchar_fd('0', 1);
+	s = ft_itoa(n);
 	if (n == -2147483648)
 		ft_putstr_fd("2147483648", 1);
 	else if (n == 0 && lst.period && (!lst.max && !lst.bool))
@@ -551,11 +518,12 @@ char			*ft_convert_d_2(int n, t_list lst)
 			ft_putchar_fd(' ', 1);
 	}
 	else
-		ft_putstr_fd(ft_itoa(n), 1);
+		ft_putstr_fd(s, 1);
 	if (lst.t_flag)
 		while (m-- > 0)
 			ft_putchar_fd(' ', 1);
-	return (str);
+	free(s);
+	return (0);
 }
 
 char			*ft_convert_d(t_list lst, va_list ap)
@@ -573,16 +541,19 @@ char			*ft_convert_p_2(char *base, long n, t_list lst)
 	int		k;
 	int		m;
 
-	str = 0;
-	j = ft_strlen(ft_itol_base(n, base));
+	str = ft_itol_base(n, base);
+	if (n == 0 && lst.min && lst.period && !lst.max)
+		j = 0;
+	else
+		j = ft_strlen(str);
 	if (lst.max >= j)
 		m = lst.min - lst.max - 2;
 	else
 		m = lst.min - j - 2;
 	if (!m)
-		k = lst.max - j - 2;
+		k = lst.max - j;
 	else
-		k = lst.max - j - 2;
+		k = lst.max - j;
 	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
 	{
 		k = m;
@@ -595,18 +566,14 @@ char			*ft_convert_p_2(char *base, long n, t_list lst)
 	while (k-- > 0)
 		ft_putchar_fd('0', 1);
 	if (n == 0 && lst.period && (!lst.max && !lst.bool))
-	{
-		if (!lst.min)
-			;
-		else
-			ft_putchar_fd(' ', 1);
-	}
+		;
 	else
-		ft_putstr_fd(ft_itol_base(n, base), 1);
+		ft_putstr_fd(str, 1);
 	if (lst.t_flag)
 		while (m-- > 0)
 			ft_putchar_fd(' ', 1);
-	return (str);
+	free(str);
+	return (0);
 }
 
 char			*ft_convert_p(t_list lst, va_list ap)
@@ -626,6 +593,7 @@ char			*ft_convert_c_2(char c, t_list lst)
 	char	*str;
 	int		j;
 	int		m;
+	int		k;
 
 	str = 0;
 	j = 1;
@@ -635,9 +603,17 @@ char			*ft_convert_c_2(char c, t_list lst)
 		m = lst.min;
 	else
 		m = lst.min - j;
+	k = 0;
+	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
+	{
+		k = m;
+		m = 0;
+	}
 	if (!lst.t_flag)
 		while (m-- > 0)
 			ft_putchar_fd(' ', 1);
+	while (k-- > 0)
+		ft_putchar_fd('0', 1);
 	ft_putchar_fd(c, 1);
 	if (lst.t_flag)
 		while (m-- > 0)
@@ -706,13 +682,14 @@ t_list			ft_zero_flag(t_list lst)
 {
 	if (lst.t_flag)
 		return (lst);
-	lst.zero_flag = 1;
+	if (!lst.min)
+		lst.zero_flag = 1;
 	return (lst);
 }
 
 t_list			ft_star(t_list lst, va_list ap)
 {
-	int n; 
+	int n;
 
 	if (lst.period == 0)
 	{
@@ -732,7 +709,6 @@ t_list			ft_star(t_list lst, va_list ap)
 		n = va_arg(ap, int);
 		if (n < 0)
 		{
-			//lst = ft_t_flag(lst);
 			lst.max = 0;
 			lst.bool = 1;
 		}
@@ -781,12 +757,11 @@ char			*ft_lst_flag(char *av, va_list ap, t_list lst)
 	{
 		if (av[i] == '-')
 			lst = ft_t_flag(lst);
-		else if (av[i] == '0' && !lst.period) //&& av[i + 1] >= '1' && av[i + 1] <= '9')
+		else if (av[i] == '0' && !lst.period)
 			lst = ft_zero_flag(lst);
 		else if (av[i] >= '0' && av[i] <= '9')
 		{
 			lst = ft_mm_flag(lst, ((char*)av) + i);
-			//i += ft_sum(i, ((char*)av) + i);
 		}
 		else if (av[i] == '.')
 		{
@@ -802,6 +777,8 @@ char			*ft_lst_flag(char *av, va_list ap, t_list lst)
 			lst = ft_star(lst, ap);
 		lst = ft_read_flag(lst, av, i);
 	}
+	if (lst.flag == 0)
+		return (0);
 	if (lst.zero_flag && !lst.emax && lst.period)
 	{
 		lst.max = 0;
@@ -851,7 +828,7 @@ int				ft_sum_i(char *av)
 	{
 		i = -1;
 		while (tab[++i])
-			if(tab[i] == av[count])
+			if (tab[i] == av[count])
 				return (++count);
 		count++;
 	}
@@ -868,7 +845,6 @@ int				ft_printf(const char *av, ...)
 
 	va_start(ap, av);
 	i = 0;
-	j = 0;
 	str = 0;
 	ft_putchar_fd(' ', -6);
 	while (av[i])
@@ -876,15 +852,12 @@ int				ft_printf(const char *av, ...)
 		if (av[i] == '%')
 		{
 			s = ft_lst_init(((char*)av) + i, ap);
-			j += ft_strlen(s);
 			ft_putstr_fd(s, 1);
-			i += ft_sum_i(((char*)av) + i);
+			if (!(i += ft_sum_i(((char*)av) + i)))
+				return (-1);
 		}
 		else
-		{
 			ft_putchar_fd(av[i++], 1);
-			j++;
-		}
 	}
 	j = ft_putchar_fd(' ', -4);
 	va_end(ap);
