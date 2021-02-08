@@ -250,9 +250,31 @@ char			*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-void			ft_putchar_fd(char c, int fd)
+int			ft_putchar_fd(char c, int fd)
 {
-	write(fd, &c, 1);
+	static int i;
+	int z;
+
+	z = 0;
+	if (fd == -6)
+	{
+		i = 0;
+		return (i);
+	}
+	else if (fd == -4)
+		return (i);
+	else if (c == '\0')
+	{
+		write(1, &z, 1);
+		i++;
+		return (i);
+	}
+	else
+	{
+		write(fd, &c, 1);
+		i++;
+		return (i);
+	}
 }
 
 void			ft_putstr_fd(char *s, int fd)
@@ -263,7 +285,7 @@ void			ft_putstr_fd(char *s, int fd)
 	if (s && fd)
 	{
 		while (s[++i])
-			write(fd, &s[i], 1);
+			ft_putchar_fd(s[i], fd);
 	}
 }
 
@@ -312,7 +334,7 @@ int				ft_atoi(const char *str)
 	return ((int)i);
 }
 
-char			*ft_max(t_list lst, char *s, char *str)
+void			*ft_max(t_list lst, char *s, char *str)
 {
 	char	temp[2];
 	int		i;
@@ -324,7 +346,7 @@ char			*ft_max(t_list lst, char *s, char *str)
 	{
 		temp[0] = s[i];
 		temp[1] = 0;
-		str = ft_strjoin(str, temp);
+		ft_putstr_fd(temp, 1);
 		i++;
 	}
 	return (str);
@@ -356,21 +378,21 @@ char			*ft_convert_x_2(char *base, long n, t_list lst)
 	}
 	if (!lst.t_flag)
 		while (m-- > 0)
-			str = ft_strjoin(str, " ");
+			ft_putchar_fd(' ', 1);
 	while (k-- > 0)
-		str = ft_strjoin(str, "0");
+		ft_putchar_fd('0', 1);
 	if (n == 0 && lst.period && (!lst.max && !lst.bool))
 	{
 		if (!lst.min)
 			;
 		else
-			str = ft_strjoin(str, " ");
+			ft_putchar_fd(' ', 1);
 	}
 	else
-		str = ft_strjoin(str, ft_itoa_base(n, base));
+		ft_putstr_fd(ft_itoa_base(n, base), 1);
 	if (lst.t_flag)
 		while (m-- > 0)
-			str = ft_strjoin(str, " ");
+			ft_putchar_fd(' ', 1);
 	return (str);
 }
 
@@ -414,21 +436,21 @@ char			*ft_convert_u_2(char *base, unsigned int n, t_list lst)
 	}
 	if (!lst.t_flag)
 		while (m-- > 0)
-			str = ft_strjoin(str, " ");
+			ft_putchar_fd(' ', 1);
 	while (k-- > 0)
-		str = ft_strjoin(str, "0");
+		ft_putchar_fd('0', 1);
 	if (n == 0 && lst.period && (!lst.max && !lst.bool))
 	{
 		if (!lst.min)
 			;
 		else
-			str = ft_strjoin(str, " ");
+			ft_putchar_fd(' ', 1);
 	}
 	else
-		str = ft_strjoin(str, ft_itoa_base(n, base));
+		ft_putstr_fd(ft_itoa_base(n, base), 1);
 	if (lst.t_flag)
 		while (m-- > 0)
-			str = ft_strjoin(str, " ");
+			ft_putchar_fd(' ', 1);
 	return (str);
 }
 
@@ -462,14 +484,14 @@ char			*ft_convert_s_2(char *s, t_list lst)
 		m = lst.min - j;
 	if (!lst.t_flag)
 		while (m-- > 0)
-			str = ft_strjoin(str, " ");
+			ft_putchar_fd(' ', 1);
 	if (j != 0 && ft_strlen_2(s) > lst.max && lst.max)
 		str = ft_max(lst, s, str);
 	else if (j != 0 && (lst.max || !lst.period || lst.bool))
-		str = ft_strjoin(str, s);
+		ft_putstr_fd(s, 1);
 	if (lst.t_flag)
 		while (m-- > 0)
-			str = ft_strjoin(str, " ");
+			ft_putchar_fd(' ', 1);
 	return (str);
 }
 
@@ -511,28 +533,28 @@ char			*ft_convert_d_2(int n, t_list lst)
 	}
 	if (!lst.t_flag)
 		while (m-- > 0)
-			str = ft_strjoin(str, " ");
+			ft_putchar_fd(' ', 1);
 	if (n < 0)
 	{
-		str = ft_strjoin(str, "-");
+		ft_putchar_fd('-', 1);
 		n = -n;
 	}
 	while (k-- > 0)
-		str = ft_strjoin(str, "0");
+		ft_putchar_fd('0', 1);
 	if (n == -2147483648)
-		str = ft_strjoin(str, "2147483648");
+		ft_putstr_fd("2147483648", 1);
 	else if (n == 0 && lst.period && (!lst.max && !lst.bool))
 	{
 		if (!lst.min)
 			;
 		else
-			str = ft_strjoin(str, " ");
+			ft_putchar_fd(' ', 1);
 	}
 	else
-		str = ft_strjoin(str, ft_itoa(n));
+		ft_putstr_fd(ft_itoa(n), 1);
 	if (lst.t_flag)
 		while (m-- > 0)
-			str = ft_strjoin(str, " ");
+			ft_putchar_fd(' ', 1);
 	return (str);
 }
 
@@ -568,22 +590,22 @@ char			*ft_convert_p_2(char *base, long n, t_list lst)
 	}
 	if (!lst.t_flag)
 		while (m-- > 0)
-			str = ft_strjoin(str, " ");
-	str = ft_strjoin(str, "0x");
+			ft_putchar_fd(' ', 1);
+	ft_putstr_fd("0x", 1);
 	while (k-- > 0)
-		str = ft_strjoin(str, "0");
+		ft_putchar_fd('0', 1);
 	if (n == 0 && lst.period && (!lst.max && !lst.bool))
 	{
 		if (!lst.min)
 			;
 		else
-			str = ft_strjoin(str, " ");
+			ft_putchar_fd(' ', 1);
 	}
 	else
-		str = ft_strjoin(str, ft_itol_base(n, base));
+		ft_putstr_fd(ft_itol_base(n, base), 1);
 	if (lst.t_flag)
 		while (m-- > 0)
-			str = ft_strjoin(str, " ");
+			ft_putchar_fd(' ', 1);
 	return (str);
 }
 
@@ -599,17 +621,14 @@ char			*ft_convert_p(t_list lst, va_list ap)
 	return (str);
 }
 
-chae			*ft_convert_c_2(char *s, t_list lst)
+char			*ft_convert_c_2(char c, t_list lst)
 {
 	char	*str;
 	int		j;
 	int		m;
 
 	str = 0;
-	if (s[0] != 0)
-		j = ft_strlen(s);
-	else
-		j = 1;
+	j = 1;
 	if (lst.max <= j && lst.max)
 		m = lst.min - lst.max;
 	else if (!lst.max && lst.period && lst.min && !lst.bool)
@@ -618,32 +637,25 @@ chae			*ft_convert_c_2(char *s, t_list lst)
 		m = lst.min - j;
 	if (!lst.t_flag)
 		while (m-- > 0)
-			str = ft_strjoin(str, " ");
-	if (j != 0 && ft_strlen_2(s) > lst.max && lst.max)
-		str = ft_max(lst, s, str);
-	else if (j != 0 && (lst.max || !lst.period || lst.bool))
-		str = ft_strjoin(str, s);
-	//else if (s[0] == 0)
-	//	str = ft_strjoin(str, "\0");
+			ft_putchar_fd(' ', 1);
+	ft_putchar_fd(c, 1);
 	if (lst.t_flag)
 		while (m-- > 0)
-			str = ft_strjoin(str, " ");
+			ft_putchar_fd(' ', 1);
 	return (str);
 }
 
 char			*ft_convert_c(t_list lst, va_list ap)
 {
-	char *s;
+	char c;
 	char *str;
 
-	s = malloc(sizeof(2));
+	str = 0;
 	if (lst.flag == '%')
-		s[0] = '%';
+		c = '%';
 	else
-		s[0] = va_arg(ap, int);
-	s[1] = '\0';
-	str = ft_convert_c_2(s, lst);
-	free(s);
+		c = va_arg(ap, int);
+	str = ft_convert_c_2(c, lst);
 	return (str);
 }
 
@@ -858,6 +870,7 @@ int				ft_printf(const char *av, ...)
 	i = 0;
 	j = 0;
 	str = 0;
+	ft_putchar_fd(' ', -6);
 	while (av[i])
 	{
 		if (av[i] == '%')
@@ -873,6 +886,7 @@ int				ft_printf(const char *av, ...)
 			j++;
 		}
 	}
+	j = ft_putchar_fd(' ', -4);
 	va_end(ap);
 	return (j);
 }
