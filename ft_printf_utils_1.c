@@ -6,7 +6,7 @@
 /*   By: adidion <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 12:22:12 by adidion           #+#    #+#             */
-/*   Updated: 2021/02/09 12:22:28 by adidion          ###   ########.fr       */
+/*   Updated: 2021/02/09 12:56:03 by adidion          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,28 +34,6 @@ int				ft_strlen_2(char *str)
 	return (i);
 }
 
-static char		*ft_strrev(char *str)
-{
-	int		i;
-	int		len;
-	char	c;
-
-	i = 0;
-	len = 0;
-	if (!str)
-		return (0);
-	while (str[len] != '\0')
-		len++;
-	while (i < len / 2)
-	{
-		c = str[i];
-		str[i] = str[len - i - 1];
-		str[len - i - 1] = c;
-		i++;
-	}
-	return (str);
-}
-
 int				check_base_2(char *base)
 {
 	int i;
@@ -76,6 +54,28 @@ int				check_base_2(char *base)
 		}
 	}
 	return (1);
+}
+
+char			*ft_strrev(char *str)
+{
+	int		i;
+	int		len;
+	char	c;
+
+	i = 0;
+	len = 0;
+	if (!str)
+		return (0);
+	while (str[len] != '\0')
+		len++;
+	while (i < len / 2)
+	{
+		c = str[i];
+		str[i] = str[len - i - 1];
+		str[len - i - 1] = c;
+		i++;
+	}
+	return (str);
 }
 
 int				check_base(int n, char *base)

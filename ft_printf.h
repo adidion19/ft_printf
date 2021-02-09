@@ -6,7 +6,7 @@
 /*   By: adidion <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/02 10:32:31 by adidion           #+#    #+#             */
-/*   Updated: 2021/02/09 12:26:12 by adidion          ###   ########.fr       */
+/*   Updated: 2021/02/09 12:55:19 by adidion          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ typedef struct	s_list
 	int		bool;
 }				t_list;
 
+char			*ft_strrev(char *str);
 int				ft_printf(const char *av, ...);
 int				ft_sum_i(char *av);
 char			*ft_lst_init(char *av, va_list ap);
