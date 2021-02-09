@@ -308,6 +308,32 @@ void			*ft_max(t_list lst, char *s, char *str)
 	return (str);
 }
 
+int				ft_convert_x_3(int j, t_list lst)
+{
+	int m;
+
+	m = 0;
+	if (lst.max >= j)
+		m = lst.min - lst.max;
+	else
+		m = lst.min - j;
+	return (m);
+}
+
+int				ft_convert_x_4(int m, int j, t_list lst)
+{
+	int k;
+
+	k = 0;
+	if (!m)
+		k = lst.max - j;
+	else
+		k = lst.max - j;
+	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
+		k = m;
+	return (k);
+}
+
 char			*ft_convert_x_2(char *base, long n, t_list lst)
 {
 	char	*str;
@@ -317,36 +343,20 @@ char			*ft_convert_x_2(char *base, long n, t_list lst)
 
 	str = ft_itoa_base(n, base);
 	j = ft_strlen(str);
-	if (lst.max >= j)
-		m = lst.min - lst.max;
-	else
-		m = lst.min - j;
-	if (!m)
-		k = lst.max - j;
-	else
-		k = lst.max - j;
+	m = ft_convert_x_3(j, lst);
+	k = ft_convert_x_4(m, j, lst);
 	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
-	{
-		k = m;
 		m = 0;
-	}
-	if (!lst.t_flag)
-		while (m-- > 0)
-			ft_putchar_fd(' ', 1);
+	while (!lst.t_flag && m-- > 0)
+		ft_putchar_fd(' ', 1);
 	while (k-- > 0)
 		ft_putchar_fd('0', 1);
-	if (n == 0 && lst.period && (!lst.max && !lst.bool))
-	{
-		if (!lst.min)
-			;
-		else
-			ft_putchar_fd(' ', 1);
-	}
-	else
+	if (!(n == 0 && lst.period && (!lst.max && !lst.bool)))
 		ft_putstr_fd(str, 1);
-	if (lst.t_flag)
-		while (m-- > 0)
-			ft_putchar_fd(' ', 1);
+	else if (lst.min)
+		ft_putchar_fd(' ', 1);
+	while (lst.t_flag && m-- > 0)
+		ft_putchar_fd(' ', 1);
 	free(str);
 	return (0);
 }
@@ -367,6 +377,32 @@ char			*ft_convert_x(t_list lst, va_list ap)
 	return (str);
 }
 
+int				ft_convert_u_3(int j, t_list lst)
+{
+	int m;
+
+	m = 0;
+	if (lst.max >= j)
+		m = lst.min - lst.max;
+	else
+		m = lst.min - j;
+	return (m);
+}
+
+int				ft_convert_u_4(int j, int m, t_list lst)
+{
+	int k;
+
+	k = 0;
+	if (!m)
+		k = lst.max - j;
+	else
+		k = lst.max - j;
+	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
+		k = m;
+	return (k);
+}
+
 char			*ft_convert_u_2(char *base, unsigned int n, t_list lst)
 {
 	char	*str;
@@ -376,36 +412,20 @@ char			*ft_convert_u_2(char *base, unsigned int n, t_list lst)
 
 	str = ft_itoa_base(n, base);
 	j = ft_strlen(str);
-	if (lst.max >= j)
-		m = lst.min - lst.max;
-	else
-		m = lst.min - j;
-	if (!m)
-		k = lst.max - j;
-	else
-		k = lst.max - j;
+	m = ft_convert_u_3(j, lst);
+	k = ft_convert_u_4(j, m, lst);
 	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
-	{
-		k = m;
 		m = 0;
-	}
-	if (!lst.t_flag)
-		while (m-- > 0)
-			ft_putchar_fd(' ', 1);
+	while (!lst.t_flag && m-- > 0)
+		ft_putchar_fd(' ', 1);
 	while (k-- > 0)
 		ft_putchar_fd('0', 1);
-	if (n == 0 && lst.period && (!lst.max && !lst.bool))
-	{
-		if (!lst.min)
-			;
-		else
-			ft_putchar_fd(' ', 1);
-	}
-	else
+	if (!(n == 0 && lst.period && (!lst.max && !lst.bool)))
 		ft_putstr_fd(str, 1);
-	if (lst.t_flag)
-		while (m-- > 0)
-			ft_putchar_fd(' ', 1);
+	else if (lst.min)
+		ft_putchar_fd(' ', 1);
+	while (lst.t_flag && m-- > 0)
+		ft_putchar_fd(' ', 1);
 	free(str);
 	return (0);
 }
@@ -422,6 +442,30 @@ char			*ft_convert_u(t_list lst, va_list ap)
 	return (str);
 }
 
+int				ft_convert_s_4(int m, t_list lst)
+{
+	int k;
+
+	k = 0;
+	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
+		k = m;
+	return (k);
+}
+
+int				ft_convert_s_3(int j, t_list lst)
+{
+	int m;
+
+	m = 0;
+	if (lst.max <= j && lst.max)
+		m = lst.min - lst.max;
+	else if (!lst.max && lst.period && lst.min && !lst.bool)
+		m = lst.min;
+	else
+		m = lst.min - j;
+	return (m);
+}
+
 char			*ft_convert_s_2(char *s, t_list lst)
 {
 	char	*str;
@@ -433,30 +477,20 @@ char			*ft_convert_s_2(char *s, t_list lst)
 	if (s == NULL)
 		s = "(null)";
 	j = ft_strlen(s);
-	if (lst.max <= j && lst.max)
-		m = lst.min - lst.max;
-	else if (!lst.max && lst.period && lst.min && !lst.bool)
-		m = lst.min;
-	else
-		m = lst.min - j;
-	k = 0;
+	m = ft_convert_s_3(j, lst);
+	k = ft_convert_s_4(m, lst);
 	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
-	{
-		k = m;
 		m = 0;
-	}
-	if (!lst.t_flag)
-		while (m-- > 0)
-			ft_putchar_fd(' ', 1);
+	while (!lst.t_flag && m-- > 0)
+		ft_putchar_fd(' ', 1);
 	while (k-- > 0)
 		ft_putchar_fd('0', 1);
 	if (j != 0 && ft_strlen_2(s) > lst.max && lst.max)
 		str = ft_max(lst, s, str);
 	else if (j != 0 && (lst.max || !lst.period || lst.bool))
 		ft_putstr_fd(s, 1);
-	if (lst.t_flag)
-		while (m-- > 0)
-			ft_putchar_fd(' ', 1);
+	while (lst.t_flag && m-- > 0)
+		ft_putchar_fd(' ', 1);
 	return (str);
 }
 
@@ -470,6 +504,62 @@ char			*ft_convert_s(t_list lst, va_list ap)
 	return (str);
 }
 
+int				ft_convert_d_3(int n, int j, t_list lst)
+{
+	int m;
+
+	m = 0;
+	if (lst.max >= j)
+		m = lst.min - lst.max;
+	else
+		m = lst.min - j;
+	if (lst.max >= j && n < 0)
+		m--;
+	return (m);
+}
+
+void			ft_convert_d_5(int n, int m, int k, t_list lst)
+{
+	char *s;
+
+	s = 0;
+	while (!lst.t_flag && m-- > 0)
+		ft_putchar_fd(' ', 1);
+	if (n < 0)
+		ft_putchar_fd('-', 1);
+	if (n < 0)
+		n = -n;
+	while (k-- > 0)
+		ft_putchar_fd('0', 1);
+	s = ft_itoa(n);
+	if (n == -2147483648)
+		ft_putstr_fd("2147483648", 1);
+	else if (n == 0 && lst.period && (!lst.max && !lst.bool))
+	{
+		if (lst.min)
+			ft_putchar_fd(' ', 1);
+	}
+	else
+		ft_putstr_fd(s, 1);
+	while (lst.t_flag && m-- > 0)
+		ft_putchar_fd(' ', 1);
+	free(s);
+}
+
+int				ft_convert_d_4(int n, int m, int j, t_list lst)
+{
+	int k;
+
+	k = 0;
+	if (!m)
+		k = lst.max - j;
+	else
+		k = lst.max - j;
+	if (n < 0)
+		k++;
+	return (k);
+}
+
 char			*ft_convert_d_2(int n, t_list lst)
 {
 	char	*s;
@@ -480,49 +570,13 @@ char			*ft_convert_d_2(int n, t_list lst)
 	s = ft_itoa(n);
 	j = ft_strlen(s);
 	free(s);
-	if (lst.max >= j)
-		m = lst.min - lst.max;
-	else
-		m = lst.min - j;
-	if (!m)
-		k = lst.max - j;
-	else
-		k = lst.max - j;
-	if (n < 0)
-		k++;
-	if (lst.max >= j && n < 0)
-		m--;
+	m = ft_convert_d_3(n, j, lst);
+	k = ft_convert_d_4(n, m, j, lst);
 	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
-	{
 		k = m;
+	if (((!lst.max && !lst.period) || lst.bool) && lst.zero_flag)
 		m = 0;
-	}
-	if (!lst.t_flag)
-		while (m-- > 0)
-			ft_putchar_fd(' ', 1);
-	if (n < 0)
-	{
-		ft_putchar_fd('-', 1);
-		n = -n;
-	}
-	while (k-- > 0)
-		ft_putchar_fd('0', 1);
-	s = ft_itoa(n);
-	if (n == -2147483648)
-		ft_putstr_fd("2147483648", 1);
-	else if (n == 0 && lst.period && (!lst.max && !lst.bool))
-	{
-		if (!lst.min)
-			;
-		else
-			ft_putchar_fd(' ', 1);
-	}
-	else
-		ft_putstr_fd(s, 1);
-	if (lst.t_flag)
-		while (m-- > 0)
-			ft_putchar_fd(' ', 1);
-	free(s);
+	ft_convert_d_5(n, m, k, lst);
 	return (0);
 }
 
