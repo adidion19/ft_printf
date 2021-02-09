@@ -6,7 +6,7 @@
 /*   By: adidion <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/02 10:32:31 by adidion           #+#    #+#             */
-/*   Updated: 2021/02/02 13:48:42 by adidion          ###   ########.fr       */
+/*   Updated: 2021/02/09 12:26:12 by adidion          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,27 +16,22 @@
 # include <stdlib.h>
 # include <stdarg.h>
 
-typedef struct  s_list
+typedef struct	s_list
 {
-    char    flag;
-    int     t_flag;
-    int     zero_flag;
-    int     zero_print;
-    int     space_print;
-    int     min;
-    int     emin;
-    int     emax;
-    int     max;
-    int     period;
-    int     bool;
-}              t_list;
+	char	flag;
+	int		t_flag;
+	int		zero_flag;
+	int		zero_print;
+	int		space_print;
+	int		min;
+	int		emin;
+	int		emax;
+	int		max;
+	int		period;
+	int		bool;
+}				t_list;
 
-typedef struct  s_bool
-{
-    int bool;
-}               t_bool;
-
-int             ft_printf(const char *av, ...);
+int				ft_printf(const char *av, ...);
 int				ft_sum_i(char *av);
 char			*ft_lst_init(char *av, va_list ap);
 char			*ft_lst_flag(char *av, va_list ap, t_list lst);
