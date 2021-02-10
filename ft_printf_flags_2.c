@@ -6,7 +6,7 @@
 /*   By: adidion <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/09 12:22:49 by adidion           #+#    #+#             */
-/*   Updated: 2021/02/09 12:22:52 by adidion          ###   ########.fr       */
+/*   Updated: 2021/02/10 11:35:54 by adidion          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@ t_list			ft_read_flag(t_list lst, char *av, int i)
 			lst.flag = av[i];
 		}
 	}
+	if (lst.flag == 0)
+		ft_putchar_fd(av[i], 1);
 	return (lst);
 }
 
